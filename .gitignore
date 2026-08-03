@@ -1,4 +1,19 @@
-./claude
-**/*/node_modules
-**/*/dist
+# Dépendances
+node_modules/
+
+# Builds
+dev/dist/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Environnement & secrets
+.env
+.env.*
+
+# Outillage local
+.claude/
+*.log
+.DS_Store
+
+# Interne (volontairement hors dépôt)
 ROADMAP.md

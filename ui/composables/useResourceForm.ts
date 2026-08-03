@@ -29,7 +29,9 @@ export function useResourceForm(
   const form = useForm(initial)
 
   function submit() {
-    let url = mode === "create" ? `${prefix}/${resourceName}` : `${prefix}/${resourceName}/${row.id}`
+    let url = mode === "create"
+      ? `${prefix}/${resourceName}`
+      : `${prefix}/${resourceName}/${row.id}`
     if (mode === "create" && scope) {
       url += `?via=${encodeURIComponent(scope.via)}&parent=${encodeURIComponent(scope.parent)}`
     }

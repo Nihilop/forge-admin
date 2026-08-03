@@ -1,0 +1,66 @@
+# CI — deux jobs parallèles :
+#   checks : format · lint · types · tests (Deno pur, rapide)
+#   build  : front admin (Vite via inertia-deno-cli) + site de doc (VitePress)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format · Lint · Types · Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Format
+        run: deno fmt --check
+
+      - name: Lint
+        run: deno lint
+
+      - name: Type-check
+        run: deno task check
+
+      - name: Tests (engine + facade)
+        run: deno task test
+
+  build:
+    name: Build front + docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build admin frontend (Vite)
+        run: deno task build
+
+      - name: Build docs site (VitePress)
+        run: deno task docs:build
