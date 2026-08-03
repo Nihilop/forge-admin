@@ -40,6 +40,7 @@ SQL Postgres — PGlite l'exécute tel quel.
 | API JSON qui coexiste avec l'admin | `GET /api/stats` |
 | Menu unifié + icônes custom | `dev/src/DevLayout.vue` + `registerNavIcon` (`main.ts`) |
 | Auth builtin (login, sessions, menu Administration, rôles dynamiques) | `auth: { seed }` (`server.ts`) |
+| [Extension OTP/2FA](otp) + élévation | `otpServer()` (`server.ts`) · `otpUi()` (`src/main.ts`) · démo « action sensible » sur le dashboard |
 | La façade `forge()` en conditions réelles | tout `dev/server.ts` (~60 lignes) |
 
 ## Ajouter une resource démo

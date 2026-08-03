@@ -142,8 +142,9 @@ admin.app.post("/api/danger", async (c) => {
   not.
 
 ::: tip Elevation & OTP
-`elevate` / `isElevated` and the `totp_*` columns are the foundation of an
-upcoming OTP extension: code confirmation for sensitive actions (temporary
-session elevation) and 2FA at login. The infrastructure is already in place —
-the extension will just plug into it.
+`elevate` / `isElevated` and the `totp_*` columns are the foundation of the
+**OTP extension**, shipped with the lib: TOTP 2FA at login and code
+confirmation for sensitive actions (temporary session elevation). It is
+disabled by default — see [2FA & elevation (OTP extension)](otp) to enable
+it.
 :::

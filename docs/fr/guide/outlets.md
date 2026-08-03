@@ -13,6 +13,7 @@ d'environnement, notifications…
 | `header:start` | Topbar, à droite du trigger sidebar (après le [slot par page](#slots-par-page-vs-outlets)). |
 | `header:end` | Topbar, à droite (avant les toggles langue/thème). |
 | `sidebar:footer` | Pied de la sidebar. |
+| `overlays` | Surcouches globales — dialogs d'extensions (ex. élévation de l'[extension OTP](otp)). |
 
 ## Enregistrer un composant
 

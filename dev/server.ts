@@ -6,6 +6,7 @@
 import { redirect } from "deno-inertia"
 import { forge } from "forge/admin"
 import { definePage } from "forge/engine"
+import { otpApiOf, otpServer } from "../extensions/otp/mod.ts"
 import { query } from "./db.ts"
 
 // Enregistre les resources de l'app (side-effect).
@@ -34,7 +35,11 @@ const admin = forge({
   prefix: ADMIN_PREFIX,
   title: "Forge — dev",
   lang: "fr",
+  // Extension OTP/2FA (fournie avec la lib, opt-in) : challenge au login si
+  // 2FA activée, page Sécurité (2FA), élévation des actions sensibles.
+  extensions: [otpServer({ issuer: "Forge dev" })],
 })
+const otp = otpApiOf(admin)
 console.log("Login démo → admin@forge.dev / forge-dev")
 
 // ── Les routes de l'APP (Forge ne les connaît pas). ──
@@ -61,6 +66,10 @@ admin.app.post("/products/:id/publish", async (c) => {
 
 // Une API JSON qui vit à côté de l'admin (l'app reste une app normale).
 admin.app.get("/api/stats", async (c) => c.json(await stats()))
+
+// Démo d'ÉLÉVATION : endpoint sensible protégé par l'extension OTP — le front
+// (Dashboard) passe par ensureElevated() avant de l'appeler.
+admin.app.post("/demo/sensitive", otp.requireElevation(), (c) => c.json({ done: true }))
 
 const PORT = Number(Deno.env.get("PORT") ?? 8083)
 console.log(`Forge dev → http://localhost:${PORT}`)

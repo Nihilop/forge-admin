@@ -11,18 +11,11 @@ export type Raw = (query: string, params?: unknown[]) => Promise<Record<string, 
 /** Dialectes de stockage pris en charge par les migrations système. */
 export type Dialect = "postgres"
 
-interface MigrationStep {
-  /** Id unique, ordonné (préfixe numérique). */
-  id: string
-  /** Les requêtes par dialecte. Un dialecte absent = étape non supportée. */
-  dialects: Record<Dialect, string[]>
-}
-
 // Schéma auth v1. La table admin embarque le nécessaire 2FA GÉNÉRIQUE
 // (totp_secret/totp_enabled) : l'extension OTP s'appuie sur le modèle Admin
 // sans migration supplémentaire. `elevated_until` sur la session prépare la
 // fonction d'élévation (confirmation OTP d'actions sensibles).
-const STEPS: MigrationStep[] = [
+const STEPS: MigrationStepDef[] = [
   {
     id: "0001_auth_core",
     dialects: {
@@ -57,10 +50,21 @@ const STEPS: MigrationStep[] = [
   },
 ]
 
-/** Applique les migrations système manquantes. Idempotent (suivi en
- *  `forge_migrations`) — sûr à exécuter à chaque boot. */
-export async function runAuthMigrations(
+/** Une étape de migration système (requêtes par dialecte) — le format que les
+ *  EXTENSIONS utilisent aussi pour leurs propres tables (ids préfixés). */
+export interface MigrationStepDef {
+  /** Id unique, ordonné (ex. `otp_0001_challenges`). */
+  id: string
+  /** Les requêtes par dialecte. Un dialecte absent = étape non supportée. */
+  dialects: Partial<Record<Dialect, string[]>>
+}
+
+/** Applique des étapes de migration manquantes (suivi partagé en
+ *  `forge_migrations`). Idempotent — sûr à exécuter à chaque boot. Utilisé par
+ *  le module auth ET par les extensions (avec leurs propres étapes). */
+export async function runMigrationSteps(
   raw: Raw,
+  steps: MigrationStepDef[],
   dialect: Dialect = "postgres",
 ): Promise<string[]> {
   await raw(
@@ -73,15 +77,20 @@ export async function runAuthMigrations(
     (await raw(`SELECT id FROM forge_migrations`)).map((r) => String(r.id)),
   )
   const applied: string[] = []
-  for (const step of STEPS) {
+  for (const step of steps) {
     if (done.has(step.id)) continue
     const queries = step.dialects[dialect]
     if (!queries) {
-      throw new Error(`Forge auth: dialecte "${dialect}" non supporté (étape ${step.id}).`)
+      throw new Error(`Forge: dialecte "${dialect}" non supporté (étape ${step.id}).`)
     }
     for (const q of queries) await raw(q)
     await raw(`INSERT INTO forge_migrations (id) VALUES ($1)`, [step.id])
     applied.push(step.id)
   }
   return applied
+}
+
+/** Applique les migrations du module AUTH. Idempotent. */
+export function runAuthMigrations(raw: Raw, dialect: Dialect = "postgres"): Promise<string[]> {
+  return runMigrationSteps(raw, STEPS, dialect)
 }

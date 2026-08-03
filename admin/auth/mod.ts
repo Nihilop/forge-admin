@@ -70,6 +70,15 @@ export interface AuthApi {
   createAdmin: (
     input: { email: string; password: string; name?: string; roleId?: string },
   ) => Promise<string | null>
+  /** Enregistre un CHALLENGE post-mot-de-passe (extensions 2FA) : appelé après
+   *  vérification réussie, il renvoie une `Response` (page de challenge) pour
+   *  INTERROMPRE la création de session, ou `null` pour laisser passer. */
+  setLoginChallenge: (
+    fn: (c: Context, admin: Row) => Promise<Response | null>,
+  ) => void
+  /** Termine un login (utilisé par les extensions après leur challenge) :
+   *  crée la session, pose le cookie et redirige vers l'admin. */
+  completeLogin: (c: Context, adminId: string) => Promise<Response>
   /** Promesse de fin d'init (migrations + seed) — les tests l'attendent. */
   ready: Promise<void>
 }
@@ -185,6 +194,20 @@ export function installAuth(app: Hono, deps: AuthDeps, options: AuthOptions = {}
   // (limite l'énumération d'utilisateurs par timing).
   const dummyHash = hashPassword("forge-dummy-password")
 
+  // Challenge post-mot-de-passe (2FA) — enregistré par une extension.
+  let loginChallenge: ((c: Context, admin: Row) => Promise<Response | null>) | null = null
+
+  /** Crée la session + cookie et redirige vers l'admin. */
+  async function completeLogin(c: Context, adminId: string): Promise<Response> {
+    const token = randomToken()
+    await raw(
+      `INSERT INTO forge_sessions (token_hash, admin_id, expires_at)
+       VALUES ($1, $2, now() + ($3 || ' hours')::interval)`,
+      [await sha256hex(token), adminId, String(ttlHours)],
+    )
+    return withCookie(deps.redirect(deps.prefix || "/"), c, token, ttlHours * 3600)
+  }
+
   // ── Routes d'authentification (racine, hors préfixe). ──
   app.get("/login", async (c) => {
     if (await sessionRow(c)) return deps.redirect(deps.prefix || "/")
@@ -208,13 +231,13 @@ export function installAuth(app: Hono, deps: AuthDeps, options: AuthOptions = {}
         _form: "Identifiants invalides.",
       })
     }
-    const token = randomToken()
-    await raw(
-      `INSERT INTO forge_sessions (token_hash, admin_id, expires_at)
-       VALUES ($1, $2, now() + ($3 || ' hours')::interval)`,
-      [await sha256hex(token), rows[0].id, String(ttlHours)],
-    )
-    return withCookie(deps.redirect(deps.prefix || "/"), c, token, ttlHours * 3600)
+    // Challenge post-mot-de-passe (2FA) : une extension peut interrompre ici.
+    if (loginChallenge) {
+      const full = await raw(`SELECT * FROM forge_admins WHERE id = $1`, [rows[0].id])
+      const challenge = await loginChallenge(c, full[0] ?? rows[0])
+      if (challenge) return challenge
+    }
+    return await completeLogin(c, String(rows[0].id))
   })
 
   app.post("/logout", async (c) => {
@@ -359,6 +382,10 @@ export function installAuth(app: Hono, deps: AuthDeps, options: AuthOptions = {}
   const api: AuthApi = {
     ready,
     createAdmin,
+    completeLogin,
+    setLoginChallenge: (fn) => {
+      loginChallenge = fn
+    },
     currentAdmin: async (c) => {
       const s = await sessionRow(c)
       return s

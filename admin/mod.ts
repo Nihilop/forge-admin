@@ -31,6 +31,7 @@ import {
   allResources,
   createForgeRouter,
   DEFAULT_ADMIN_PREFIX,
+  type ForgeAdapter,
   type ForgeContext,
   forgeNav,
 } from "../engine/mod.ts"
@@ -40,7 +41,13 @@ import { type AuthApi, type AuthOptions, installAuth } from "./auth/mod.ts"
 export { type DbOption, resolveDb, type SqlExecutor } from "./db.ts"
 export { type AuthApi, type AuthDeps, type AuthOptions, installAuth } from "./auth/mod.ts"
 export { hashPassword, verifyPassword } from "./auth/crypto.ts"
-export { type Dialect, type Raw, runAuthMigrations } from "./auth/migrations.ts"
+export {
+  type Dialect,
+  type MigrationStepDef,
+  type Raw,
+  runAuthMigrations,
+  runMigrationSteps,
+} from "./auth/migrations.ts"
 
 /** A SERVER-side extension: packages the backend half of an optional feature
  *  (2FA, audit, notifications…) — routes, resources, pages, hooks — installed
@@ -124,6 +131,9 @@ export interface ForgeApp {
   ) => Promise<Response> | Response
   /** Le préfixe effectif du CRUD. */
   prefix: string
+  /** L'adapter de données effectif — les extensions serveur s'en servent
+   *  (via `adapter.raw` pour leurs migrations/requêtes système). */
+  adapter: ForgeAdapter
   /** L'API du module d'auth builtin (présente si `auth` est activé) —
    *  `currentAdmin`, `createAdmin`, `elevate`/`isElevated` (extensions OTP). */
   auth?: AuthApi
@@ -251,12 +261,6 @@ export function forge(options: ForgeOptions): ForgeApp {
     ...options.context,
   }
 
-  app.route(prefix, createForgeRouter(ctx))
-  if (options.home) {
-    const home = options.home
-    app.get("/", (c) => c.redirect(home))
-  }
-
   const admin: ForgeApp = {
     app,
     fetch: app.fetch,
@@ -264,11 +268,19 @@ export function forge(options: ForgeOptions): ForgeApp {
     // deno-lint-ignore no-explicit-any
     render: (c, page, props = {}) => inertia.render(toWebRequest(c), page, props as any),
     prefix,
+    adapter,
     auth,
   }
 
-  // Extensions serveur : installées en dernier, sur l'app complète.
+  // Extensions serveur : AVANT le montage CRUD — leurs routes sous le préfixe
+  // (ex. <prefix>/system/otp) doivent gagner sur le catch-all /:resource.
   for (const ext of options.extensions ?? []) ext.install(admin)
+
+  app.route(prefix, createForgeRouter(ctx))
+  if (options.home) {
+    const home = options.home
+    app.get("/", (c) => c.redirect(home))
+  }
 
   return admin
 }

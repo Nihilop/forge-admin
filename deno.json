@@ -1,11 +1,12 @@
 {
   "//": "Forge — framework d'admin (engine Deno/Hono + kit Vue ui/ + harnais dev à la racine). Un seul node_modules (racine) → le kit ui/ résout ses deps npm.",
   "name": "@streemkit/forge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "exports": {
     ".": "./admin/mod.ts",
-    "./engine": "./engine/mod.ts"
+    "./engine": "./engine/mod.ts",
+    "./extensions/otp": "./extensions/otp/mod.ts"
   },
   "publish": {
     "exclude": [
@@ -32,7 +33,7 @@
     "build": "cd dev && deno run -A jsr:@streemkit/inertia-deno-cli@^0.3.0 build",
     "serve": "cd dev && PROD_MODE=1 deno run -A server.ts",
     "check": "deno check dev/server.ts",
-    "test": "deno test -A engine admin",
+    "test": "deno test -A engine admin extensions",
     "docs": "npx vitepress dev docs --port 1337",
     "docs:build": "npx vitepress build docs",
     "docs:serve": "deno run -A docs/serve.ts"

@@ -5,6 +5,7 @@ import { createForgeI18n } from "@forge/i18n"
 import { FORGE_PAGE_NS, FORGE_STORAGE_NS } from "@forge/brand"
 import { FORGE_SHELL_OPTIONS } from "@forge/shell/options"
 import { installForgeExtensions } from "@forge/extensions"
+import { otpUi } from "@forge/extensions/otp"
 import DevToolsButton from "./DevToolsButton.vue"
 import LogoutButton from "./LogoutButton.vue"
 
@@ -43,6 +44,8 @@ createInertiaApp({
         name: "dev-tools",
         outlets: { "header:end": DevToolsButton, "sidebar:footer": LogoutButton },
       },
+      // Moitié FRONT de l'extension OTP (dialog d'élévation via `overlays`).
+      otpUi(),
     ], { i18n })
 
     app.mount(el)

@@ -12,6 +12,7 @@ An **outlet** is a named anchor point in the layout where components register
 | `header:start` | Topbar, right of the sidebar trigger (after the [per-page slot](#per-page-slots-vs-outlets)). |
 | `header:end` | Topbar, right side (before the language/theme toggles). |
 | `sidebar:footer` | Bottom of the sidebar. |
+| `overlays` | Global overlays — extension dialogs (e.g. the [OTP extension](otp)'s elevation). |
 
 ## Registering a component
 

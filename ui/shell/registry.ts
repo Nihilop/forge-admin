@@ -7,6 +7,7 @@
 //   "header:start"    → topbar, à droite du trigger sidebar
 //   "header:end"      → topbar, à droite (avant langue/thème)
 //   "sidebar:footer"  → pied de la sidebar
+//   "overlays"        → surcouches globales (dialogs d'extensions : élévation…)
 //
 // L'enregistrement se fait AU BOOT (avant mount), via installForgeExtensions()
 // ou directement registerShellItem().

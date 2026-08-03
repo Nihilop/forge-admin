@@ -46,6 +46,8 @@ const sidebarDefaultOpen = typeof document === "undefined"
       <div class="flex flex-col gap-4 p-4 pt-0 flex-1 min-h-0 overflow-y-auto">
         <slot />
       </div>
+      <!-- Outlet des SURCOUCHES globales (dialogs d'extensions : élévation…) -->
+      <ForgeOutlet name="overlays" />
     </SidebarInset>
   </SidebarProvider>
 </template>

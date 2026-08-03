@@ -3,10 +3,12 @@
 // l'app (server.ts) ; `definePage` n'a ajouté que l'entrée de menu. La page
 // compose le layout injecté + les primitives du kit, comme n'importe quelle
 // page métier d'un hôte réel.
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { Link } from "@inertiajs/vue3"
-import { PhArrowRight } from "@phosphor-icons/vue"
+import { PhArrowRight, PhLockKey } from "@phosphor-icons/vue"
+import { Button } from "@forge/primitives/button"
 import { Card, CardContent } from "@forge/primitives/card"
+import { ensureElevated } from "@forge/extensions/otp"
 import { useForgeLayout } from "@forge/layout"
 import { useForgePrefix } from "@forge/prefix"
 
@@ -17,6 +19,16 @@ const prefix = useForgePrefix()
 const props = defineProps<{
   stats: { products: number; active: number; orders: number; pending: number }
 }>()
+
+// Démo d'ÉLÉVATION (extension OTP) : l'action exige une session élevée —
+// confirmation OTP si la 2FA est activée, accord direct sinon (mode souple).
+const sensitiveResult = ref("")
+async function fireSensitive() {
+  sensitiveResult.value = ""
+  if (!(await ensureElevated(prefix))) return
+  const res = await fetch("/demo/sensitive", { method: "POST", credentials: "include" })
+  sensitiveResult.value = res.ok ? "Action exécutée (session élevée) ✓" : `Refusé (${res.status})`
+}
 
 const tiles = computed(() => [
   { label: "Produits", value: props.stats.products, href: `${prefix}/products` },
@@ -48,5 +60,16 @@ const tiles = computed(() => [
         </CardContent>
       </Card>
     </div>
+
+    <!-- Démo élévation (extension OTP) -->
+    <Card class="mt-4 max-w-md">
+      <CardContent class="space-y-2">
+        <p class="text-xs text-muted-foreground">Démo extension OTP — action sensible</p>
+        <Button variant="outline" size="sm" @click="fireSensitive">
+          <PhLockKey :size="15" /> Exécuter l'action sensible
+        </Button>
+        <p v-if="sensitiveResult" class="text-xs text-muted-foreground">{{ sensitiveResult }}</p>
+      </CardContent>
+    </Card>
   </component>
 </template>

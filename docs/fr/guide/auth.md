@@ -142,8 +142,9 @@ admin.app.post("/api/danger", async (c) => {
   non.
 
 ::: tip Élévation & OTP
-`elevate` / `isElevated` et les colonnes `totp_*` sont le socle d'une
-extension OTP à venir : confirmation par code des actions sensibles
-(élévation temporaire de session) et 2FA au login. L'infrastructure est déjà
-en place — l'extension n'aura qu'à s'y brancher.
+`elevate` / `isElevated` et les colonnes `totp_*` sont le socle de
+l'**extension OTP**, fournie avec la lib : 2FA TOTP au login et confirmation
+par code des actions sensibles (élévation temporaire de session). Elle est
+désactivée par défaut — voir [2FA & élévation (extension OTP)](otp) pour
+l'activer.
 :::
