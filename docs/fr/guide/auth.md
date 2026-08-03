@@ -110,6 +110,20 @@ sans rien synchroniser.
   permissions), sans être supprimés. Le rôle **Super admin** est
   indestructible.
 
+### Profil (`<prefix>/system/profile`)
+
+Le compte de l'admin **connecté** — accessible à tout admin, sans permission
+particulière :
+
+- **Identité** : email (lecture seule) et nom affiché, modifiable.
+- **Mot de passe** : changement protégé — le mot de passe **actuel** est
+  exigé et vérifié, le nouveau doit faire 8 caractères minimum.
+
+La page expose l'outlet **`profile:sections`** : les extensions y ajoutent
+leurs propres sections. L'[extension OTP](otp) s'en sert pour afficher sa
+carte « Sécurité (2FA) » (état d'enrôlement + accès à la gestion) — vos
+extensions peuvent faire pareil, voir [Outlets](outlets).
+
 ## L'API `admin.auth`
 
 `forge({ auth })` expose l'API sur le retour (`admin.auth`, type `AuthApi`) :

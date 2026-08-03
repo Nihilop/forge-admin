@@ -61,6 +61,16 @@ export default {
       elevateTitle: "Confirmation required",
       elevateHint: "This sensitive action requires a code from your authenticator app.",
     },
+    profile: {
+      title: "Profile",
+      identity: "Identity",
+      name: "Display name",
+      password: "Password",
+      currentPassword: "Current password",
+      newPassword: "New password",
+      changePassword: "Change password",
+      manage: "Manage",
+    },
     auth: {
       subtitle: "Sign in to continue",
       email: "Email",

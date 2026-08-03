@@ -14,6 +14,12 @@ An **outlet** is a named anchor point in the layout where components register
 | `sidebar:footer` | Bottom of the sidebar. |
 | `overlays` | Global overlays — extension dialogs (e.g. the [OTP extension](otp)'s elevation). |
 
+## Outlets provided by kit pages
+
+| Outlet | Location |
+|---|---|
+| `profile:sections` | Sections of the [Profile](auth#profile-prefix-system-profile) page — the OTP extension mounts its 2FA card there. |
+
 ## Registering a component
 
 Two ways, always **before `app.mount()`**:

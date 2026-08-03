@@ -123,6 +123,21 @@ Deno.test("otp · élévation SOUPLE : sans 2FA enrôlée, l'élévation est ina
   assertEquals((await elevate.json()).ok, true)
 })
 
+Deno.test("otp · /state (section Profil) : état d'enrollment en JSON, 401 anonyme", async () => {
+  const anon = await admin.fetch(
+    new Request("http://localhost/admin/system/otp/state", { headers: inertiaHeaders }),
+  )
+  assertEquals(anon.status, 401)
+  const session = cookieOf(await login(), "forge_session")
+  const res = await admin.fetch(
+    new Request("http://localhost/admin/system/otp/state", {
+      headers: { ...inertiaHeaders, Cookie: session },
+    }),
+  )
+  assertEquals(res.status, 200)
+  assertEquals(await res.json(), { ok: true, enabled: false }) // pas encore enrôlé
+})
+
 Deno.test("otp · enrollment : generate → secret, enable avec un vrai code TOTP", async () => {
   const session = cookieOf(await login(), "forge_session")
   const gen = await post("/admin/system/otp/generate", session, {})
@@ -180,6 +195,14 @@ Deno.test("otp · login avec 2FA : challenge exigé, code vérifié, session cr�
     }),
   )
   assertEquals(list.status, 200)
+
+  // La section Profil de l'extension voit maintenant la 2FA active.
+  const state = await admin.fetch(
+    new Request("http://localhost/admin/system/otp/state", {
+      headers: { ...inertiaHeaders, Cookie: session },
+    }),
+  )
+  assertEquals(await state.json(), { ok: true, enabled: true })
 })
 
 Deno.test("otp · élévation STRICTE avec 2FA : code exigé puis action rejouée", async () => {

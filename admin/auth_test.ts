@@ -214,6 +214,66 @@ Deno.test("auth · logout : session détruite, cookie purgé", async () => {
   assertEquals(after.headers.get("location"), "/login")
 })
 
+Deno.test("auth · profil : page rendue avec l'admin courant + entrée de menu", async () => {
+  const cookie = cookieOf(await login("root@example.com", "s3cret-forge"))
+  const res = await admin.fetch(
+    new Request("http://localhost/admin/system/profile", {
+      headers: { ...inertiaHeaders, Cookie: cookie },
+    }),
+  )
+  assertEquals(res.status, 200)
+  const page = await res.json()
+  assertEquals(page.component, "forge/Profile")
+  const me = page.props.admin as { email: string; role: string | null }
+  assertEquals(me.email, "root@example.com")
+  assertEquals(me.role, "Super admin")
+  const nav = (page.props.forge as { nav: { group: string; label: string }[] }).nav
+  assert(nav.some((e) => e.group === "Administration" && e.label === "Profil"))
+})
+
+Deno.test("auth · profil : mise à jour du nom affiché", async () => {
+  const cookie = cookieOf(await login("root@example.com", "s3cret-forge"))
+  const res = await admin.fetch(
+    new Request("http://localhost/admin/system/profile", {
+      method: "POST",
+      redirect: "manual",
+      headers: { ...inertiaHeaders, "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ name: "Rooty" }),
+    }),
+  )
+  assertEquals(res.status, 303)
+  assertEquals(res.headers.get("location"), "/admin/system/profile")
+  const rows = await query(`SELECT name FROM forge_admins WHERE email = 'root@example.com'`)
+  assertEquals(rows[0].name, "Rooty")
+})
+
+Deno.test("auth · profil : changement de mot de passe (l'actuel est vérifié)", async () => {
+  await admin.auth!.createAdmin({ email: "pwd@example.com", password: "premier-pass-123" })
+  const cookie = cookieOf(await login("pwd@example.com", "premier-pass-123"))
+  const post = (body: Record<string, string>) =>
+    admin.fetch(
+      new Request("http://localhost/admin/system/profile/password", {
+        method: "POST",
+        redirect: "manual",
+        headers: { ...inertiaHeaders, "Content-Type": "application/json", Cookie: cookie },
+        body: JSON.stringify(body),
+      }),
+    )
+  // Mot de passe actuel erroné → erreur de validation, rien ne change.
+  const wrong = await (await post({ current: "faux", next: "nouveau-pass-123" })).json()
+  assertEquals(wrong.props.errors.current, "Mot de passe actuel incorrect.")
+  // Nouveau trop court → erreur dédiée.
+  const short = await (await post({ current: "premier-pass-123", next: "court" })).json()
+  assertEquals(short.props.errors.next, "8 caractères minimum.")
+  // Succès : l'ancien ne passe plus, le nouveau ouvre une session.
+  const ok = await post({ current: "premier-pass-123", next: "nouveau-pass-123" })
+  assertEquals(ok.status, 303)
+  const old = await (await login("pwd@example.com", "premier-pass-123")).json()
+  assertEquals(old.props.errors._form, "Identifiants invalides.")
+  const fresh = await login("pwd@example.com", "nouveau-pass-123")
+  assertEquals(fresh.status, 303)
+})
+
 Deno.test("auth · élévation : marquage et lecture (socle de l'extension OTP)", async () => {
   const cookie = cookieOf(await login("root@example.com", "s3cret-forge"))
   // Contexte Hono minimal : seul req.header/cookie est utilisé par l'API.

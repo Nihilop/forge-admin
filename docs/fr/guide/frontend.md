@@ -83,10 +83,11 @@ installForgeExtensions(app, [
 ], { i18n })   // avant app.mount()
 ```
 
-Outlets fournis par le shell : `header:start` (topbar, après le trigger),
-`header:end` (topbar, à droite) et `sidebar:footer` (pied de la sidebar). Le
-pendant **serveur** d'une extension (routes, resources, pages) passe par
-l'option `extensions` de la [façade](facade).
+Outlets fournis : `header:start` (topbar, après le trigger), `header:end`
+(topbar, à droite), `sidebar:footer` (pied de la sidebar), `overlays`
+(surcouches globales) et `profile:sections` (page Profil) — voir
+[Outlets](outlets). Le pendant **serveur** d'une extension (routes,
+resources, pages) passe par l'option `extensions` de la [façade](facade).
 
 ## Les composables
 

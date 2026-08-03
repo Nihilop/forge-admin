@@ -8,6 +8,8 @@
 //   "header:end"      → topbar, à droite (avant langue/thème)
 //   "sidebar:footer"  → pied de la sidebar
 //   "overlays"        → surcouches globales (dialogs d'extensions : élévation…)
+// Outlets fournis par les PAGES du kit :
+//   "profile:sections" → sections de la page Profil (carte 2FA de l'ext. OTP…)
 //
 // L'enregistrement se fait AU BOOT (avant mount), via installForgeExtensions()
 // ou directement registerShellItem().

@@ -200,7 +200,7 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
 
   // ── Racine du CRUD (`GET <prefix>`) : redirige vers la première entrée de
   // nav du périmètre — cible sûre pour un login ou un lien nu vers l'admin. ──
-  app.get("/", (c) => {
+  app.get("/", (_c) => {
     const first = forgeNav().find((e) => e.href.startsWith(`${prefix}/`))
     return ctx.redirect(first?.href ?? "/")
   })

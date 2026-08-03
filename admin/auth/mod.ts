@@ -248,6 +248,83 @@ export function installAuth(app: Hono, deps: AuthDeps, options: AuthOptions = {}
     return withCookie(deps.redirect("/login"), c, "", 0)
   })
 
+  // ── Page PROFIL : le compte de l'admin CONNECTÉ (identité, mot de passe).
+  // Les extensions s'y ajoutent via l'outlet `profile:sections` du kit. ──
+  const profilePath = `${deps.prefix}/system/profile`
+
+  async function profileProps(c: Context): Promise<Record<string, unknown> | null> {
+    const s = await sessionRow(c)
+    if (!s) return null
+    const rows = await raw(
+      `SELECT a.email, a.name, r.name AS role FROM forge_admins a
+       LEFT JOIN forge_roles r ON r.id = a.role_id WHERE a.id = $1`,
+      [s.admin_id],
+    )
+    const me = rows[0]
+    return me
+      ? {
+        admin: {
+          email: String(me.email),
+          name: me.name == null ? null : String(me.name),
+          role: me.role == null ? null : String(me.role),
+        },
+        prefix: deps.prefix,
+      }
+      : null
+  }
+
+  app.get(profilePath, async (c) => {
+    const props = await profileProps(c)
+    if (!props) return deps.redirect("/login")
+    return deps.render(c, forgePage("Profile"), props)
+  })
+
+  // Identité (nom affiché).
+  app.post(profilePath, async (c) => {
+    if (!deps.sameOrigin(c)) return deps.redirect("/login")
+    const s = await sessionRow(c)
+    if (!s) return deps.redirect("/login")
+    const body = await c.req.json().catch(() => ({})) as { name?: string }
+    await raw(`UPDATE forge_admins SET name = NULLIF($1, '') WHERE id = $2`, [
+      String(body.name ?? "").trim(),
+      s.admin_id,
+    ])
+    return deps.redirect(profilePath)
+  })
+
+  // Changement de mot de passe (l'actuel est exigé et vérifié).
+  app.post(`${profilePath}/password`, async (c) => {
+    if (!deps.sameOrigin(c)) return deps.redirect("/login")
+    const s = await sessionRow(c)
+    if (!s) return deps.redirect("/login")
+    const body = await c.req.json().catch(() => ({})) as { current?: string; next?: string }
+    const me = await raw(`SELECT password_hash FROM forge_admins WHERE id = $1`, [s.admin_id])
+    const props = (await profileProps(c))!
+    if (!(await verifyPassword(String(body.current ?? ""), String(me[0]?.password_hash ?? "")))) {
+      return deps.renderErrors(c, forgePage("Profile"), props, {
+        current: "Mot de passe actuel incorrect.",
+      })
+    }
+    const next = String(body.next ?? "")
+    if (next.length < 8) {
+      return deps.renderErrors(c, forgePage("Profile"), props, {
+        next: "8 caractères minimum.",
+      })
+    }
+    await raw(`UPDATE forge_admins SET password_hash = $1 WHERE id = $2`, [
+      await hashPassword(next),
+      s.admin_id,
+    ])
+    return deps.redirect(profilePath)
+  })
+
+  definePage({
+    name: "forge-profile",
+    href: profilePath,
+    label: "Profil",
+    nav: { group: "Administration", label: "Profil", icon: "user", order: 88 },
+  })
+
   // ── Page RÔLES & PERMISSIONS (custom, catalogue DYNAMIQUE par requête). ──
   const rolesPath = `${deps.prefix}/system/roles`
 

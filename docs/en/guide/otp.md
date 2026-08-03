@@ -38,10 +38,11 @@ import { otpUi } from "@forge/extensions/otp"
 installForgeExtensions(app, [otpUi()], { i18n })
 ```
 
-That's it: the "Security (2FA)" page shows up under the **Administration**
-menu, the challenge slots into the login of 2FA-enabled admins, and the
-elevation dialog is mounted (through the shell's [`overlays`](outlets)
-outlet).
+That's it: the "Security (2FA)" card shows up on the
+[Profile](auth#profile-prefix-system-profile) page (through the
+[`profile:sections`](outlets) outlet), the challenge slots into the login of
+2FA-enabled admins, and the elevation dialog is mounted (through the shell's
+[`overlays`](outlets) outlet).
 
 ## The options (`OtpOptions`)
 
@@ -55,8 +56,8 @@ outlet).
 
 ### Enrollment — the "Security (2FA)" page
 
-Each admin manages **their own** 2FA, on `<prefix>/system/otp`
-(Administration menu):
+Each admin manages **their own** 2FA, on `<prefix>/system/otp` — the
+"Manage" button on the 2FA card of their Profile page leads there:
 
 1. **Generate a secret** — the page shows the `otpauth://` URI (QR-ready)
    plus the plain key for manual entry.
@@ -142,6 +143,6 @@ auth ones. It builds on the `totp_*` columns already provisioned by the
 - **Protected disabling**: turning your 2FA off requires a valid code.
 
 ::: tip Want to see it all running?
-The [example app](playground) enables the extension: "Security (2FA)" page in
-the menu, "sensitive action" demo on the dashboard.
+The [example app](playground) enables the extension: 2FA card on the Profile
+page, "sensitive action" demo on the dashboard.
 :::

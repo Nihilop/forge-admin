@@ -217,7 +217,6 @@ export function forge(options: ForgeOptions): ForgeApp {
   if (prod) app.use("/assets/*", serveAssets(options.dist ?? "dist"))
 
   const adapter = resolveDb(options.db)
-  // deno-lint-ignore no-explicit-any
   const render: ForgeContext["render"] = (c, page, props) =>
     // deno-lint-ignore no-explicit-any
     inertia.render(toWebRequest(c), page, props as any)

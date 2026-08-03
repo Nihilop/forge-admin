@@ -8,7 +8,6 @@
 import type { Context } from "hono"
 import { getCookie } from "hono/cookie"
 import { forgePage, type Row } from "../../engine/mod.ts"
-import { definePage } from "../../engine/mod.ts"
 import type { ForgeApp, ForgeExtension } from "../../admin/mod.ts"
 import { type MigrationStepDef, runMigrationSteps } from "../../admin/auth/migrations.ts"
 import { randomToken, sha256hex } from "../../admin/auth/crypto.ts"
@@ -168,6 +167,15 @@ function installOtp(admin: ForgeApp, options: OtpOptions): OtpApi {
     return current ? await adminRowById(current.id) : null
   }
 
+  // État 2FA de l'admin courant (JSON) — consommé par la section « Profil »
+  // de l'extension (outlet `profile:sections`).
+  app.get(`${setupPath}/state`, async (c) => {
+    await ready
+    const me = await currentFullAdmin(c)
+    if (!me) return c.json({ ok: false, error: "unauthenticated" }, 401)
+    return c.json({ ok: true, enabled: me.totp_enabled === true })
+  })
+
   app.get(setupPath, async (c) => {
     await ready
     const me = await currentFullAdmin(c)
@@ -248,13 +256,8 @@ function installOtp(admin: ForgeApp, options: OtpOptions): OtpApi {
     return c.json({ ok: true })
   })
 
-  // Entrée de menu (chaque admin connecté gère sa propre 2FA).
-  definePage({
-    name: "forge-otp-setup",
-    href: setupPath,
-    label: "Sécurité (2FA)",
-    nav: { group: "Administration", label: "Sécurité (2FA)", icon: "shield", order: 92 },
-  })
+  // Pas d'entrée de menu : la page 2FA se rejoint depuis la page PROFIL, où
+  // l'extension injecte sa section via l'outlet `profile:sections`.
 
   return {
     ready,

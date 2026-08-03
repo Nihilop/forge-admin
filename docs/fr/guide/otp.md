@@ -38,9 +38,11 @@ import { otpUi } from "@forge/extensions/otp"
 installForgeExtensions(app, [otpUi()], { i18n })
 ```
 
-C'est tout : la page « Sécurité (2FA) » apparaît dans le menu
-**Administration**, le challenge s'intercale au login des admins 2FA, et le
-dialog d'élévation est monté (via l'outlet [`overlays`](outlets) du shell).
+C'est tout : la carte « Sécurité (2FA) » apparaît sur la page
+[Profil](auth#profil-prefix-system-profile) (via l'outlet
+[`profile:sections`](outlets)), le challenge s'intercale au login des admins
+2FA, et le dialog d'élévation est monté (via l'outlet [`overlays`](outlets)
+du shell).
 
 ## Les options (`OtpOptions`)
 
@@ -54,8 +56,8 @@ dialog d'élévation est monté (via l'outlet [`overlays`](outlets) du shell).
 
 ### Enrôlement — page « Sécurité (2FA) »
 
-Chaque admin gère **sa** 2FA, sur `<prefix>/system/otp` (menu
-Administration) :
+Chaque admin gère **sa** 2FA, sur `<prefix>/system/otp` — le bouton
+« Gérer » de la carte 2FA de sa page Profil y mène :
 
 1. **Générer un secret** — la page affiche l'URI `otpauth://` (compatible QR)
    et la clé en clair pour la saisie manuelle.
@@ -144,6 +146,6 @@ faire de votre côté.
 - **Désactivation protégée** : couper sa 2FA exige un code valide.
 
 ::: tip Envie de voir tourner le tout ?
-L'[app exemple](playground) active l'extension : page « Sécurité (2FA) » au
-menu, démo « action sensible » sur le dashboard.
+L'[app exemple](playground) active l'extension : carte 2FA sur la page
+Profil, démo « action sensible » sur le dashboard.
 :::

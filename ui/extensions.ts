@@ -25,8 +25,9 @@ export interface ForgeI18nLike {
 export interface ForgeUiExtension {
   /** Nom unique (diagnostic). */
   name: string
-  /** Composants montés dans les outlets du shell (`{ "header:end": Comp, … }`).
-   *  Outlets fournis : `header:start`, `header:end`, `sidebar:footer`. */
+  /** Composants montés dans les outlets du kit (`{ "header:end": Comp, … }`).
+   *  Outlets fournis : `header:start`, `header:end`, `sidebar:footer`,
+   *  `overlays` (shell) et `profile:sections` (page Profil). */
   outlets?: Record<string, Component>
   /** Composants d'affichage de champ (`display: "<nom>"` sur un champ). */
   displays?: Record<string, Component>

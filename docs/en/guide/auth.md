@@ -109,6 +109,20 @@ sync.
   permissions), without being deleted. The **Super admin** role is
   indestructible.
 
+### Profile (`<prefix>/system/profile`)
+
+The **signed-in** admin's own account — reachable by every admin, no
+particular permission required:
+
+- **Identity**: email (read-only) and display name, editable.
+- **Password**: protected change — the **current** password is required and
+  verified, the new one must be at least 8 characters.
+
+The page exposes the **`profile:sections`** outlet: extensions add their own
+sections there. The [OTP extension](otp) uses it to show its "Security (2FA)"
+card (enrollment state + link to management) — your extensions can do the
+same, see [Outlets](outlets).
+
 ## The `admin.auth` API
 
 `forge({ auth })` exposes the API on the return value (`admin.auth`, type

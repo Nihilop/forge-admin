@@ -63,6 +63,16 @@ export default {
       elevateTitle: "Confirmation requise",
       elevateHint: "Cette action sensible demande un code de votre application d'authentification.",
     },
+    profile: {
+      title: "Profil",
+      identity: "Identité",
+      name: "Nom affiché",
+      password: "Mot de passe",
+      currentPassword: "Mot de passe actuel",
+      newPassword: "Nouveau mot de passe",
+      changePassword: "Changer le mot de passe",
+      manage: "Gérer",
+    },
     auth: {
       subtitle: "Connectez-vous pour continuer",
       email: "Email",

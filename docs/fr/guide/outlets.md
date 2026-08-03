@@ -15,6 +15,12 @@ d'environnement, notifications…
 | `sidebar:footer` | Pied de la sidebar. |
 | `overlays` | Surcouches globales — dialogs d'extensions (ex. élévation de l'[extension OTP](otp)). |
 
+## Outlets fournis par les pages du kit
+
+| Outlet | Emplacement |
+|---|---|
+| `profile:sections` | Sections de la page [Profil](auth#profil-prefix-system-profile) — l'extension OTP y monte sa carte 2FA. |
+
 ## Enregistrer un composant
 
 Deux voies, toujours **avant `app.mount()`** :
