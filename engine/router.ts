@@ -11,6 +11,9 @@ import { setForgePrefix } from "./prefix.ts"
 import type { ForgeAdapter, ListWhere, Row } from "./adapter.ts"
 import { postgresAdapter } from "./adapters/postgres.ts"
 
+/** Everything the engine needs, injected by the host: data, auth, rendering,
+ *  redirects. This is what keeps the engine agnostic — it has no opinion about
+ *  your database, session system or view layer. */
 export interface ForgeContext {
   /** Adapter de données (contrat adapter.ts). Postgres fourni :
    *  `adapter: postgresAdapter({ query })`. Alternative : `query` (sucre). */
@@ -19,14 +22,19 @@ export interface ForgeContext {
    *  postgres.js, Neon…) — enveloppé automatiquement dans `postgresAdapter`.
    *  Ignoré si `adapter` est fourni. */
   query?: (sql: string, params?: unknown[]) => Promise<Row[]>
+  /** Permissions effectives de l'opérateur courant (`null` = anonyme → /login). */
   permissions: (c: Context) => Promise<string[] | null>
+  /** Rend une page (le moteur nomme les siennes `forge/ResourceIndex|Show|Form`
+   *  et injecte `prefix` dans les props). */
   render: (c: Context, page: string, props: Record<string, unknown>) => Promise<Response> | Response
+  /** Rend avec erreurs de validation (clés de champs + `_form`). */
   renderErrors: (
     c: Context,
     page: string,
     props: Record<string, unknown>,
     errors: Record<string, string>,
   ) => Promise<Response> | Response
+  /** Réponse de redirection (303 recommandé pour Inertia). */
   redirect: (to: string) => Response
   /** Anti-CSRF des mutations : renvoie false si la requête n'est pas same-origin.
    *  Injecté (le moteur reste agnostique). Absent → seul le cookie SameSite protège. */
@@ -37,6 +45,10 @@ export interface ForgeContext {
   prefix?: string
 }
 
+/** Builds the generic CRUD router (Hono) over every registered resource:
+ *  list (search, faceted filters, sort, pagination), detail (+ `hasMany`
+ *  sections), forms, mutations (validation, RBAC, CSRF guard, hooks). Mount it
+ *  at the same prefix as `ctx.prefix`: `app.route("/admin", router)`. */
 export function createForgeRouter(ctx: ForgeContext): Hono {
   const app = new Hono()
   // Fixé pour tout le process (forgeNav() en dépend aussi).

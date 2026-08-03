@@ -7,11 +7,15 @@ import { getResource, type ResourceDef } from "../resource.ts"
 import type { Field } from "../field.ts"
 import type { ForgeAdapter, ListSelect, ListWhere, RelationTarget, Row } from "../adapter.ts"
 
+/** Options of {@linkcode postgresAdapter}. */
 export interface PostgresAdapterOptions {
   /** Exécute le SQL généré (SEUL point driver). */
   query: (sql: string, params?: unknown[]) => Promise<Row[]>
 }
 
+/** The reference {@linkcode ForgeAdapter}: translates the engine's intents into
+ *  parameterized Postgres SQL. The DRIVER stays yours — any
+ *  `(sql, params) => rows` executor works (PGlite, postgres.js, Neon…). */
 export function postgresAdapter({ query }: PostgresAdapterOptions): ForgeAdapter {
   // Expression SELECT d'un champ. belongsTo → {id, label} via sous-requête. La
   // colonne FK est qualifiée par la table EXTERNE (`outerTable`) : sans ça, un

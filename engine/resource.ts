@@ -20,6 +20,7 @@ export interface ForgeNav {
 export interface HasManyDef {
   /** Clé (id de la section). */
   key: string
+  /** Libellé de la section (défaut : la clé). */
   label?: string
   /** Resource enfant. */
   resource: string
@@ -39,6 +40,7 @@ export interface HasManyDef {
 export interface ActionDef {
   /** Id unique. */
   key: string
+  /** Libellé du bouton. */
   label: string
   /** URL ; `:id` est remplacé par l'id de la ligne. POST par défaut, GET si `link`. */
   href: string
@@ -47,6 +49,7 @@ export interface ActionDef {
   link?: boolean
   /** Nom d'icône (résolu côté front). */
   icon?: string
+  /** Style du bouton. Défaut : `outline`. */
   variant?: "default" | "outline" | "ghost" | "destructive" | "secondary"
   /** Texte de confirmation avant de tirer (sinon pas de confirm). */
   confirm?: string
@@ -58,11 +61,14 @@ export interface ActionDef {
   visibleWhen?: { field: string; equals?: unknown; notEquals?: unknown }
 }
 
+/** The declaration of a resource (a model/table) — Forge generates its full CRUD from it.
+ *  Declare with {@linkcode defineResource}; importing the file registers it. */
 export interface ResourceDef {
   /** Slug dans l'URL : `<prefix>/:name` (préfixe : `ForgeContext.prefix`, défaut /admin). */
   name: string
   /** Table SQL. */
   table: string
+  /** Libellé affiché. */
   label: string
   /** Permission de base : `${policy}.read` / `${policy}.write`. OBLIGATOIRE —
    *  sans elle, la resource serait ouverte à tout opérateur authentifié. */
@@ -98,16 +104,25 @@ export interface ResourceDef {
     /** Après un DELETE réussi (soft ou hard). `row` = état AVANT suppression. */
     afterDelete?: (e: { id: string; row: Record<string, unknown> | null }) => void | Promise<void>
   }
+  /** Les champs de la resource — voir les helpers de `field.ts`. */
   fields: Field[]
 }
 
+/** One entry of the unified sidebar menu, as produced by {@linkcode forgeNav}. */
 export interface ForgeNavEntry {
+  /** Id (nom de resource ou de page). */
   name: string
+  /** URL cible. */
   href: string
+  /** Libellé affiché. */
   label: string
+  /** Groupe de la sidebar. */
   group: string
+  /** Ordre dans le groupe. */
   order: number
+  /** Nom d'icône (résolu côté front). */
   icon?: string
+  /** Permission requise pour voir l'entrée. */
   permission?: string
   /** Lien actif en match EXACT (pages custom type Dashboard). */
   exact?: boolean
@@ -145,6 +160,8 @@ export function forgeNav(): ForgeNavEntry[] {
 
 const registry = new Map<string, ResourceDef>()
 
+/** Declares and registers a resource. Throws if `policy` is missing (RBAC guard-rail).
+ *  Importing the declaring file is enough — no separate registration step. */
 export function defineResource(def: ResourceDef): ResourceDef {
   // Garde-fou : une resource sans policy serait lisible ET mutable par tout
   // opérateur authentifié. On refuse à l'enregistrement plutôt qu'en silence.
@@ -155,10 +172,12 @@ export function defineResource(def: ResourceDef): ResourceDef {
   return def
 }
 
+/** Looks up a registered resource by its `name` slug. */
 export function getResource(name: string): ResourceDef | undefined {
   return registry.get(name)
 }
 
+/** Every registered resource, in registration order. */
 export function allResources(): ResourceDef[] {
   return [...registry.values()]
 }

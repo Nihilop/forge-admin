@@ -1,7 +1,39 @@
-// Forge · moteur — API PUBLIQUE. Point d'import unique pour les consommateurs
-// (l'admin AIOS, l'app exemple dev/, tout futur back-office). Le moteur est
-// AGNOSTIQUE : données (adapter), auth (permissions), rendu (render) et
-// redirection sont INJECTÉS via ForgeContext → il ne dépend que de Hono.
+/**
+ * Forge engine — the agnostic CRUD core.
+ *
+ * Declare resources with {@linkcode defineResource}, mount the generated CRUD
+ * with {@linkcode createForgeRouter}, and inject everything else (data through
+ * a {@linkcode ForgeAdapter}, auth through `permissions`, rendering through
+ * `render`) via the {@linkcode ForgeContext}. The engine depends on Hono only
+ * and works headless — no assumption about your database, auth system or view
+ * layer.
+ *
+ * For the batteries-included experience (Inertia rendering, assets, CSRF
+ * guard, Postgres from a URL), use the `@streemkit/forge` root export instead.
+ *
+ * @example Declare a resource and mount the CRUD
+ * ```ts
+ * import { createForgeRouter, defineResource, postgresAdapter, text } from "@streemkit/forge/engine"
+ *
+ * defineResource({
+ *   name: "products",
+ *   table: "products",
+ *   label: "Products",
+ *   policy: "catalog",
+ *   fields: [text("name", { editable: true, required: true })],
+ * })
+ *
+ * const router = createForgeRouter({
+ *   adapter: postgresAdapter({ query: (sql, params) => db.query(sql, params) }),
+ *   permissions: () => Promise.resolve(["catalog.read", "catalog.write"]),
+ *   render: (c, page, props) => myRender(c, page, props),
+ *   renderErrors: (c, page, props, errors) => myRender(c, page, props, errors),
+ *   redirect: (to) => Response.redirect(to, 303),
+ * })
+ * ```
+ *
+ * @module
+ */
 
 // Routeur CRUD générique
 export { createForgeRouter, type ForgeContext } from "./router.ts"
@@ -42,8 +74,10 @@ export {
   date,
   email,
   type Field,
+  type FieldFactory,
   type FieldOption,
   type FieldType,
+  type PublicField,
   publicField,
   type Relation,
   select,

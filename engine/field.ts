@@ -2,6 +2,7 @@
 // spécifique-atlas). Les helpers produisent des `Field` typés ; le routeur les
 // transforme en colonnes SQL, le kit Vue les transforme en composants.
 
+/** The built-in field kinds (each has a matching helper: `text()`, `badge()`…). */
 export type FieldType = "text" | "email" | "select" | "badge" | "date" | "belongsTo"
 
 /** Relation belongsTo : clé étrangère vers une autre resource. */
@@ -14,16 +15,25 @@ export interface Relation {
   labelField: string
 }
 
+/** One choice of a `select`/`badge` field. Submitted values are validated against these. */
 export interface FieldOption {
+  /** Stored value. */
   value: string
+  /** Displayed label. */
   label: string
   /** teinte du badge : success | warning | danger | primary | muted */
   tone?: "success" | "warning" | "danger" | "primary" | "muted"
 }
 
+/** A resource field: how one column is displayed (list + detail) and edited (form).
+ *  Create them with the typed helpers ({@linkcode text}, {@linkcode badge},
+ *  {@linkcode belongsTo}…) rather than by hand. */
 export interface Field {
+  /** Field key (also the default column, and the prop key sent to the frontend). */
   key: string
+  /** Field kind — drives the display and input components. */
   type: FieldType
+  /** Display label. */
   label: string
   /** Colonne ou EXPRESSION SQL d'AFFICHAGE (code-defined, donc sûre). Défaut : "key". */
   column?: string
@@ -70,10 +80,15 @@ function make(type: FieldType): FieldFactory {
   })
 }
 
+/** Short text field (labels, references…). */
 export const text: FieldFactory = make("text")
+/** Email field — validated in the form. */
 export const email: FieldFactory = make("email")
+/** Dropdown field (requires `options`). */
 export const select: FieldFactory = make("select")
+/** Colored enum field (`options` + `tone`) — automatically filterable in lists. */
 export const badge: FieldFactory = make("badge")
+/** Timestamp field — provide an epoch-ms `column` expression, the frontend formats it. */
 export const date: FieldFactory = make("date")
 
 /** Champ belongsTo : FK vers une autre resource (affichée en lien, éditée en select). */
@@ -99,15 +114,25 @@ export function belongsTo(
 /** Forme « publique » d'un champ, envoyée au front (sans les détails serveur :
  *  ni `column`/`writeColumn`, ni `permission`). */
 export interface PublicField {
+  /** Field key (prop key of the row values). */
   key: string
+  /** Field kind. */
   type: FieldType
+  /** Display label. */
   label: string
+  /** Choices (`select`/`badge`), or resolved targets for an editable `belongsTo`. */
   options?: FieldOption[]
+  /** Registered custom display component name. */
   display?: string
+  /** Registered custom input component name. */
   input?: string
+  /** Editable in the form. */
   editable: boolean
+  /** Required on input. */
   required: boolean
+  /** belongsTo metadata. */
   relation?: Relation
+  /** Full-width rendering (detail + form). */
   wide: boolean
 }
 

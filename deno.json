@@ -1,7 +1,7 @@
 {
   "//": "Forge — framework d'admin (engine Deno/Hono + kit Vue ui/ + harnais dev à la racine). Un seul node_modules (racine) → le kit ui/ résout ses deps npm.",
   "name": "@streemkit/forge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "exports": {
     ".": "./admin/mod.ts",

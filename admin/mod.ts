@@ -1,14 +1,27 @@
-// Forge · FAÇADE « batteries incluses » — le mode plug-and-play au-dessus du
-// moteur agnostique. `forge(options)` assemble Hono + Inertia (deno-inertia) +
-// routeur CRUD + assets avec des DÉFAUTS partout ; chaque brique reste
-// remplaçable (options + `context` en escape hatch). L'utilisateur avancé
-// continue d'utiliser `createForgeRouter` + son propre ForgeContext.
-//
-//   import { forge } from "forge/admin"
-//   import "./resources/products.ts"
-//   const admin = forge({ db: Deno.env.get("DATABASE_URL")!, permissions: "open" })
-//   admin.app.get("/", (c) => admin.render(c, "Dashboard", { … }))  // tes routes
-//   Deno.serve(admin.fetch)
+/**
+ * Forge — the plug-and-play admin panel for Deno (batteries-included facade).
+ *
+ * {@linkcode forge} wires Hono, Inertia (`@streemkit/inertia-deno`), the CRUD
+ * router, static assets and a CSRF guard with sane defaults. Every part stays
+ * replaceable (options + the `context` escape hatch). Advanced hosts can
+ * assemble everything themselves with `@streemkit/forge/engine`.
+ *
+ * @example A complete back-office
+ * ```ts
+ * import { forge } from "@streemkit/forge"
+ * import "./resources/products.ts"   // defineResource(...) side-effect
+ *
+ * const admin = forge({
+ *   db: Deno.env.get("DATABASE_URL")!, // Postgres URL | { query } | ForgeAdapter
+ *   permissions: "open",               // DEV ONLY — see the permissions guide
+ * })
+ *
+ * admin.app.get("/api/health", (c) => c.json({ ok: true })) // your routes
+ * Deno.serve(admin.fetch)
+ * ```
+ *
+ * @module
+ */
 
 import { type Context, Hono } from "hono"
 import { createInertia, pageToHtml, redirect } from "deno-inertia"
@@ -25,11 +38,16 @@ import { type DbOption, resolveDb } from "./db.ts"
 
 export { type DbOption, resolveDb, type SqlExecutor } from "./db.ts"
 
+/** The `permissions` option: `"open"` (dev only — grants everything derived
+ *  from the registry), a static list, or a per-request resolver (`null` =
+ *  anonymous → redirect to `/login`). */
 export type PermissionsOption =
   | "open"
   | string[]
   | ((c: Context) => Promise<string[] | null>)
 
+/** Options of {@linkcode forge}. Only `db` and `permissions` are required —
+ *  everything else has a sane default and stays overridable. */
 export interface ForgeOptions {
   /** Données : URL Postgres (driver intégré), exécuteur `{ query }`, ou
    *  ForgeAdapter complet (autre stockage). */
@@ -65,6 +83,7 @@ export interface ForgeOptions {
   context?: Partial<ForgeContext>
 }
 
+/** What {@linkcode forge} returns: the assembled app, ready for `Deno.serve`. */
 export interface ForgeApp {
   /** Le Hono assemblé — ajoute tes routes métier dessus. */
   app: Hono
@@ -125,10 +144,19 @@ function resolvePermissions(p: PermissionsOption): ForgeContext["permissions"] {
   return p
 }
 
+/** Lecture d'env SANS dépendre du global `Deno` (compat Node/Bun/workers). */
+function envGet(key: string): string | undefined {
+  return (globalThis as { Deno?: { env: { get(k: string): string | undefined } } })
+    .Deno?.env.get(key)
+}
+
+/** Builds the complete admin app: Hono + Inertia rendering + CRUD router +
+ *  static assets + CSRF guard, with defaults everywhere. Add your own routes
+ *  on `app`, then `Deno.serve(admin.fetch)`. */
 export function forge(options: ForgeOptions): ForgeApp {
   const prefix = options.prefix ?? DEFAULT_ADMIN_PREFIX
   const app = options.app ?? new Hono()
-  const prod = options.prod ?? Deno.env.get("PROD_MODE") === "1"
+  const prod = options.prod ?? envGet("PROD_MODE") === "1"
 
   const inertia = createInertia({
     version: options.version ?? "1.0.0",

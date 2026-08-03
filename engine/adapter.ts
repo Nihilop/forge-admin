@@ -11,6 +11,7 @@
 import type { Field } from "./field.ts"
 import type { ResourceDef } from "./resource.ts"
 
+/** A data row, as returned by adapters and passed to hooks. */
 export type Row = Record<string, unknown>
 
 /** Contraintes de sélection, déjà VALIDÉES par le routeur : `filters` ne
@@ -23,18 +24,24 @@ export interface ListWhere {
   filters?: { field: Field; value: string }[]
 }
 
+/** Full selection for {@linkcode ForgeAdapter.list}: constraints + projection,
+ *  sorting and pagination. */
 export interface ListSelect extends ListWhere {
   /** Champs à projeter (belongsTo → `{id,label}`). */
   fields: Field[]
   /** Tri demandé ; absent → `def.orderBy`, sinon défaut de l'adapter. */
   sort?: { field: Field; dir: "asc" | "desc" }
+  /** Nombre max de lignes (taille de page). */
   limit: number
+  /** Décalage de pagination. */
   offset: number
 }
 
 /** Cible d'une relation belongsTo (résolue par le routeur depuis le registre). */
 export interface RelationTarget {
+  /** Table (ou collection) de la resource cible. */
   table: string
+  /** Colonne de soft-delete de la cible, si elle en a une. */
   softDelete?: string
 }
 
