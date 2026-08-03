@@ -6,9 +6,9 @@ move into a "…" menu. The kit uses it for detail-page header buttons and
 
 ```vue
 <script setup lang="ts">
-import OverflowRow from "@/OverflowRow.vue"
-import { Button } from "@/primitives/button"
-import { DropdownMenuItem } from "@/primitives/dropdown-menu"
+import OverflowRow from "@forge/OverflowRow.vue"
+import { Button } from "@forge/primitives/button"
+import { DropdownMenuItem } from "@forge/primitives/dropdown-menu"
 
 const actions = [
   { key: "export", label: "Export", run: () => {} },

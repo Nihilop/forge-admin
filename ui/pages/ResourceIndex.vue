@@ -5,27 +5,27 @@ import {
   PhCaretDown, PhCaretLeft, PhCaretRight, PhCaretUp, PhCaretUpDown, PhColumns,
   PhDotsThreeVertical, PhMagnifyingGlass, PhPlus,
 } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
-import { Input } from "@/primitives/input"
+import { Button } from "@forge/primitives/button"
+import { Input } from "@forge/primitives/input"
 import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/primitives/dropdown-menu"
+} from "@forge/primitives/dropdown-menu"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/primitives/select"
+} from "@forge/primitives/select"
 import {
   Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow,
-} from "@/primitives/table"
-import ConfirmDialog from "@/components/ConfirmDialog.vue"
-import { confirmAction } from "@/confirm"
-import { useForgeLayout } from "@/layout"
+} from "@forge/primitives/table"
+import ConfirmDialog from "@forge/components/ConfirmDialog.vue"
+import { confirmAction } from "@forge/confirm"
+import { useForgeLayout } from "@forge/layout"
 const Layout = useForgeLayout()
-import { displayFor, type PublicField } from "@/fields"
-import { navIcon } from "@/nav"
-import { useResourceTable, type TablePagination, type TableSort } from "@/composables/useResourceTable"
-import { useForgePrefix } from "@/prefix"
-import { useForgeT } from "@/i18n"
+import { displayFor, type PublicField } from "@forge/fields"
+import { navIcon } from "@forge/nav"
+import { useResourceTable, type TablePagination, type TableSort } from "@forge/composables/useResourceTable"
+import { useForgePrefix } from "@forge/prefix"
+import { useForgeT } from "@forge/i18n"
 const t = useForgeT()
 const prefix = useForgePrefix()
 

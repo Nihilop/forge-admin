@@ -10,10 +10,10 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
-    "composables": "@/composables",
-    "utils": "@/lib/utils",
-    "ui": "@/primitives",
-    "lib": "@/lib"
+    "components": "@forge/components",
+    "composables": "@forge/composables",
+    "utils": "@forge/lib/utils",
+    "ui": "@forge/primitives",
+    "lib": "@forge/lib"
   }
 }

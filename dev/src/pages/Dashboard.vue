@@ -6,9 +6,9 @@
 import { computed } from "vue"
 import { Link } from "@inertiajs/vue3"
 import { PhArrowRight } from "@phosphor-icons/vue"
-import { Card, CardContent } from "@/primitives/card"
-import { useForgeLayout } from "@/layout"
-import { useForgePrefix } from "@/prefix"
+import { Card, CardContent } from "@forge/primitives/card"
+import { useForgeLayout } from "@forge/layout"
+import { useForgePrefix } from "@forge/prefix"
 
 const Layout = useForgeLayout()
 // Fourni par les props partagées de l'app (server.ts) — jamais codé en dur.

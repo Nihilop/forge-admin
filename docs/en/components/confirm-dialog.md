@@ -6,8 +6,8 @@ shared dialog (AlertDialog), i18n. It's what guards the CRUD's deletions and
 
 ```vue
 <script setup lang="ts">
-import ConfirmDialog from "@/components/ConfirmDialog.vue"
-import { confirmAction } from "@/confirm"
+import ConfirmDialog from "@forge/components/ConfirmDialog.vue"
+import { confirmAction } from "@forge/confirm"
 
 async function archive() {
   if (await confirmAction("Archive this project?")) {

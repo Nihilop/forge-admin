@@ -5,6 +5,14 @@ Forge exactement comme le ferait un dev externe — via l'API publique uniquemen
 Elle sert à la fois de **démo du DX**, de **spec vivante** et de **harnais de
 dev** (Vite HMR sur le kit `ui/`).
 
+::: tip Identifiants de démo
+L'app exemple utilise l'[auth builtin](auth) réelle : connectez-vous avec
+**admin@forge.dev / forge-dev** (seedés au boot — PGlite est en mémoire, tout
+est recréé à chaque démarrage). Le menu **Administration** (Admins, Rôles &
+permissions) et le bouton Déconnexion (extension d'outlet) apparaissent une
+fois connecté.
+:::
+
 ## Lancer
 
 ```bash
@@ -31,6 +39,7 @@ SQL Postgres — PGlite l'exécute tel quel.
 | Page custom (dashboard, stat tiles, deep-links filtrés) | `definePage` + `dev/src/pages/Dashboard.vue` |
 | API JSON qui coexiste avec l'admin | `GET /api/stats` |
 | Menu unifié + icônes custom | `dev/src/DevLayout.vue` + `registerNavIcon` (`main.ts`) |
+| Auth builtin (login, sessions, menu Administration, rôles dynamiques) | `auth: { seed }` (`server.ts`) |
 | La façade `forge()` en conditions réelles | tout `dev/server.ts` (~60 lignes) |
 
 ## Ajouter une resource démo

@@ -4,7 +4,7 @@ Le bouton du kit — celui de toutes les actions du CRUD.
 
 ```vue
 <script setup lang="ts">
-import { Button } from "@/primitives/button"
+import { Button } from "@forge/primitives/button"
 import { PhPlus } from "@phosphor-icons/vue"
 </script>
 

@@ -84,4 +84,9 @@ export interface ForgeAdapter {
   update(def: ResourceDef, id: string, values: Row): Promise<void>
   /** Supprime — SOFT si `def.softDelete` est défini, sinon définitivement. */
   delete(def: ResourceDef, id: string): Promise<void>
+  /** OPTIONNEL — exécuteur BRUT du stockage (requête native, paramétrée).
+   *  Utilisé par les features SYSTÈME (migrations du module auth, extensions) ;
+   *  jamais par le CRUD. Les adapters SQL doivent le fournir ; un adapter qui
+   *  ne le fournit pas rend ces features indisponibles (erreur claire). */
+  raw?: (query: string, params?: unknown[]) => Promise<Row[]>
 }

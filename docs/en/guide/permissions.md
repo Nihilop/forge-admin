@@ -3,7 +3,7 @@
 The model is deliberately simple: a permission is a **string**, an operator has
 a **list of effective permissions**, and Forge checks — it stores **nothing**.
 Where roles come from and who manages them is your system's business (or the
-upcoming built-in auth module).
+[built-in auth module](auth)'s).
 
 ## The model
 
@@ -30,7 +30,7 @@ Behaviors:
 
 ## Providing permissions
 
-Through the [facade](facade), the `permissions` option accepts three forms:
+Through the [facade](facade), four ways:
 
 ```ts
 // 1. A per-request resolver — THE production mode.
@@ -49,7 +49,13 @@ forge({ db, permissions: ["catalog.read", "catalog.write"] })
 // 3. "open" — DEV ONLY. Derives ALL permissions from the registry
 //    (policies, fields, actions, pages) and says so loudly at boot.
 forge({ db, permissions: "open" })
+
+// 4. The built-in auth — the resolver is provided automatically, wired to
+//    the stored sessions + roles. `permissions` becomes optional.
+forge({ db, auth: true })  // see Authentication
 ```
+
+Way 4 is detailed in [Authentication](auth).
 
 With the [bare engine](engine) it's the `permissions(c)` field of the
 `ForgeContext` — same contract: `Promise<string[] | null>`.

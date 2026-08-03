@@ -53,6 +53,8 @@ export function postgresAdapter({ query }: PostgresAdapterOptions): ForgeAdapter
   }
 
   return {
+    raw: query,
+
     async count(def, w) {
       const { where, params } = buildWhere(def, w)
       const rows = await query(`SELECT COUNT(*)::int AS n FROM "${def.table}" ${where}`, params)

@@ -42,5 +42,22 @@ export default {
       cancel: "Annuler",
       confirm: "Confirmer",
     },
+    auth: {
+      subtitle: "Connectez-vous pour continuer",
+      email: "Email",
+      password: "Mot de passe",
+      submit: "Se connecter",
+    },
+    roles: {
+      title: "Rôles & permissions",
+      description:
+        "Les permissions se déduisent de vos resources, champs, actions et pages — cette page s'adapte automatiquement.",
+      placeholder: "Nom du rôle…",
+      create: "Créer",
+      save: "Enregistrer",
+      deleteConfirm: "Supprimer ce rôle ?",
+      allPerms: "Toutes les permissions",
+      unknown: "Permissions inconnues",
+    },
   },
 }

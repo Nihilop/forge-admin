@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
-import { cn } from "@/lib/utils"
-import { Input } from '@/primitives/input'
+import { cn } from "@forge/lib/utils"
+import { Input } from '@forge/primitives/input'
 
 const props = defineProps<{
   class?: HTMLAttributes["class"]

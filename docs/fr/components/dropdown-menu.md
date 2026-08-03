@@ -7,8 +7,8 @@ Menu contextuel — celui des actions de ligne du CRUD et du sélecteur de langu
 import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/primitives/dropdown-menu"
-import { Button } from "@/primitives/button"
+} from "@forge/primitives/dropdown-menu"
+import { Button } from "@forge/primitives/button"
 import { PhDotsThreeVertical } from "@phosphor-icons/vue"
 </script>
 

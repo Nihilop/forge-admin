@@ -3,7 +3,7 @@
 Le modèle est volontairement simple : une permission est une **chaîne**, un
 opérateur a une **liste de permissions effectives**, et Forge vérifie — il ne
 stocke **rien**. D'où viennent les rôles et qui les administre, c'est votre
-système (ou le module auth builtin, à venir).
+système (ou le [module auth builtin](auth)).
 
 ## Le modèle
 
@@ -30,7 +30,7 @@ Comportements :
 
 ## Fournir les permissions
 
-Via la [façade](facade), l'option `permissions` accepte trois formes :
+Via la [façade](facade), quatre voies :
 
 ```ts
 // 1. Un résolveur par requête — LE mode production.
@@ -49,7 +49,13 @@ forge({ db, permissions: ["catalog.read", "catalog.write"] })
 // 3. "open" — DEV UNIQUEMENT. Dérive TOUTES les permissions du registre
 //    (policies, champs, actions, pages) et le dit bruyamment au boot.
 forge({ db, permissions: "open" })
+
+// 4. L'auth builtin — le résolveur est fourni automatiquement, branché
+//    sessions + rôles stockés. `permissions` devient optionnel.
+forge({ db, auth: true })  // voir Authentification
 ```
+
+La voie 4 est détaillée dans [Authentification](auth).
 
 Avec le [moteur nu](engine), c'est le champ `permissions(c)` du `ForgeContext` —
 même contrat : `Promise<string[] | null>`.

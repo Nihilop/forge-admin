@@ -4,7 +4,7 @@ Horizontal or vertical divider.
 
 ```vue
 <script setup lang="ts">
-import { Separator } from "@/primitives/separator"
+import { Separator } from "@forge/primitives/separator"
 </script>
 
 <template>

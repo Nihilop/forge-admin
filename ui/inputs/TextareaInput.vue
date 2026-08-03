@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Textarea } from "@/primitives/textarea"
+import { Textarea } from "@forge/primitives/textarea"
 import type { PublicField } from "../fields"
 
 const model = defineModel<string>()

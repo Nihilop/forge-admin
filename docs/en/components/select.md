@@ -7,7 +7,7 @@ Dropdown list — the one behind faceted filters and `select`/`badge` fields.
 import { ref } from "vue"
 import {
   Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
-} from "@/primitives/select"
+} from "@forge/primitives/select"
 
 const status = ref("all")
 </script>

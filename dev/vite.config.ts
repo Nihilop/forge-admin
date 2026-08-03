@@ -6,8 +6,8 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: {
-    // `@` = racine du KIT Forge (../ui) → les imports internes du kit résolvent.
-    alias: { "@": path.resolve(__dirname, "../ui") },
+    // `@forge` = racine du KIT Forge (../ui) → les imports internes du kit résolvent.
+    alias: { "@forge": path.resolve(__dirname, "../ui") },
   },
   server: { cors: true, host: true },
   build: { manifest: true, outDir: "dist", rollupOptions: { input: "src/main.ts" } },

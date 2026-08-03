@@ -4,8 +4,8 @@ Hover tooltip — essential on icon buttons.
 
 ```vue
 <script setup lang="ts">
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/primitives/tooltip"
-import { Button } from "@/primitives/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@forge/primitives/tooltip"
+import { Button } from "@forge/primitives/button"
 import { PhArrowsClockwise } from "@phosphor-icons/vue"
 </script>
 

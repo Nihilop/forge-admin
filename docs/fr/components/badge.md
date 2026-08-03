@@ -5,7 +5,7 @@ Le badge à **tones sémantiques** du kit — exactement le rendu des champs
 
 ```vue
 <script setup lang="ts">
-import { Badge } from "@/primitives/badge"
+import { Badge } from "@forge/primitives/badge"
 </script>
 
 <template>

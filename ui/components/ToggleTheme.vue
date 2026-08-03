@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Toggle clair/sombre du shell (persisté — voir shell/theme.ts).
 import { PhMoon, PhSun } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
+import { Button } from "@forge/primitives/button"
 import { useForgeShellOptions } from "../shell/options"
 import { useForgeTheme } from "../shell/theme"
 

@@ -35,8 +35,12 @@ import {
   forgeNav,
 } from "../engine/mod.ts"
 import { type DbOption, resolveDb } from "./db.ts"
+import { type AuthApi, type AuthOptions, installAuth } from "./auth/mod.ts"
 
 export { type DbOption, resolveDb, type SqlExecutor } from "./db.ts"
+export { type AuthApi, type AuthDeps, type AuthOptions, installAuth } from "./auth/mod.ts"
+export { hashPassword, verifyPassword } from "./auth/crypto.ts"
+export { type Dialect, type Raw, runAuthMigrations } from "./auth/migrations.ts"
 
 /** A SERVER-side extension: packages the backend half of an optional feature
  *  (2FA, audit, notifications…) — routes, resources, pages, hooks — installed
@@ -58,15 +62,21 @@ export type PermissionsOption =
   | string[]
   | ((c: Context) => Promise<string[] | null>)
 
-/** Options of {@linkcode forge}. Only `db` and `permissions` are required —
- *  everything else has a sane default and stays overridable. */
+/** Options of {@linkcode forge}. Only `db` is always required — provide either
+ *  `permissions` or `auth`; everything else has a sane default. */
 export interface ForgeOptions {
   /** Données : URL Postgres (driver intégré), exécuteur `{ query }`, ou
    *  ForgeAdapter complet (autre stockage). */
   db: DbOption
   /** RBAC : `"open"` = tout autorisé (DEV UNIQUEMENT, dérivé du registre),
-   *  une liste statique, ou un résolveur par requête (`null` = anonyme). */
-  permissions: PermissionsOption
+   *  une liste statique, ou un résolveur par requête (`null` = anonyme).
+   *  OPTIONNEL si `auth` est activé (le module fournit alors le résolveur,
+   *  branché sur sessions + rôles stockés). */
+  permissions?: PermissionsOption
+  /** AUTH BUILTIN : sessions, login, admins et rôles/permissions stockés
+   *  (tables système `forge_*`, migrées automatiquement au boot). `true` =
+   *  options par défaut. Voir {@linkcode AuthOptions}. */
+  auth?: AuthOptions | true
   /** Préfixe de montage du CRUD (défaut `/admin`). */
   prefix?: string
   /** Entrée front Vite (défaut `src/main.ts`). */
@@ -114,6 +124,9 @@ export interface ForgeApp {
   ) => Promise<Response> | Response
   /** Le préfixe effectif du CRUD. */
   prefix: string
+  /** L'API du module d'auth builtin (présente si `auth` est activé) —
+   *  `currentAdmin`, `createAdmin`, `elevate`/`isElevated` (extensions OTP). */
+  auth?: AuthApi
 }
 
 /** Toutes les permissions dérivables du registre (resources, champs, actions,
@@ -193,16 +206,47 @@ export function forge(options: ForgeOptions): ForgeApp {
 
   if (prod) app.use("/assets/*", serveAssets(options.dist ?? "dist"))
 
-  const ctx: ForgeContext = {
-    adapter: resolveDb(options.db),
-    permissions: resolvePermissions(options.permissions),
+  const adapter = resolveDb(options.db)
+  // deno-lint-ignore no-explicit-any
+  const render: ForgeContext["render"] = (c, page, props) =>
     // deno-lint-ignore no-explicit-any
-    render: (c, page, props) => inertia.render(toWebRequest(c), page, props as any),
-    renderErrors: (c, page, props, errors) =>
-      // deno-lint-ignore no-explicit-any
-      inertia.renderWithErrors(toWebRequest(c), page, props as any, errors),
-    redirect: (to) => redirect(to),
-    sameOrigin: defaultSameOrigin,
+    inertia.render(toWebRequest(c), page, props as any)
+  const renderErrors: ForgeContext["renderErrors"] = (c, page, props, errors) =>
+    // deno-lint-ignore no-explicit-any
+    inertia.renderWithErrors(toWebRequest(c), page, props as any, errors)
+  const redirectTo: ForgeContext["redirect"] = (to) => redirect(to)
+  const sameOrigin = options.context?.sameOrigin ?? defaultSameOrigin
+
+  // AUTH BUILTIN — installé AVANT le montage CRUD (ses routes /login, /logout
+  // et <prefix>/system/roles doivent gagner sur le catch-all /:resource).
+  let auth: AuthApi | undefined
+  if (options.auth) {
+    auth = installAuth(app, {
+      adapter,
+      render,
+      renderErrors,
+      redirect: redirectTo,
+      sameOrigin,
+      prefix,
+      title: options.title ?? "Admin",
+      allPermissions: openPermissions,
+    }, options.auth === true ? {} : options.auth)
+  }
+
+  const permissions = options.permissions
+    ? resolvePermissions(options.permissions)
+    : auth?.permissions
+  if (!permissions) {
+    throw new Error("Forge: fournir `permissions`, ou activer `auth` (qui fournit le résolveur).")
+  }
+
+  const ctx: ForgeContext = {
+    adapter,
+    permissions,
+    render,
+    renderErrors,
+    redirect: redirectTo,
+    sameOrigin,
     prefix,
     ...options.context,
   }
@@ -220,6 +264,7 @@ export function forge(options: ForgeOptions): ForgeApp {
     // deno-lint-ignore no-explicit-any
     render: (c, page, props = {}) => inertia.render(toWebRequest(c), page, props as any),
     prefix,
+    auth,
   }
 
   // Extensions serveur : installées en dernier, sur l'app complète.

@@ -6,8 +6,8 @@ consents/selections).
 ```vue
 <script setup lang="ts">
 import { ref } from "vue"
-import { Switch } from "@/primitives/switch"
-import { Label } from "@/primitives/label"
+import { Switch } from "@forge/primitives/switch"
+import { Label } from "@forge/primitives/label"
 
 const notifications = ref(true)
 </script>

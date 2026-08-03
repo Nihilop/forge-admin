@@ -6,7 +6,7 @@ Ephemeral notifications via [vue-sonner](https://vue-sonner.vercel.app).
 
 ```ts
 // src/main.ts — or in your custom layout
-import { Toaster } from "@/primitives/sonner"
+import { Toaster } from "@forge/primitives/sonner"
 ```
 
 ```vue

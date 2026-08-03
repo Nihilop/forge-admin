@@ -7,9 +7,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/primitives/alert-dialog"
-import { Button } from "@/primitives/button"
-import { useForgeT } from "@/i18n"
+} from "@forge/primitives/alert-dialog"
+import { Button } from "@forge/primitives/button"
+import { useForgeT } from "@forge/i18n"
 import { useConfirmDialog } from "../confirm"
 
 const t = useForgeT()

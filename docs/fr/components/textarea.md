@@ -5,7 +5,7 @@ Zone de texte multi-lignes à `v-model`.
 ```vue
 <script setup lang="ts">
 import { ref } from "vue"
-import { Textarea } from "@/primitives/textarea"
+import { Textarea } from "@forge/primitives/textarea"
 
 const notes = ref("")
 </script>

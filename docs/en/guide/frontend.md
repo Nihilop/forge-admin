@@ -11,7 +11,7 @@ The engine renders pages named `forge/ResourceIndex|Show|Form`; your custom
 pages have free names (`Dashboard`…). The dual resolver handles both:
 
 ```ts
-import { FORGE_PAGE_NS } from "@/brand"
+import { FORGE_PAGE_NS } from "@forge/brand"
 
 resolve: (name) => {
   const isForge = name.startsWith(`${FORGE_PAGE_NS}/`)
@@ -35,7 +35,7 @@ and **outlets** where extensions plug in.
 Customization through options:
 
 ```ts
-import { FORGE_SHELL_OPTIONS } from "@/shell/options"
+import { FORGE_SHELL_OPTIONS } from "@forge/shell/options"
 
 app.provide(FORGE_SHELL_OPTIONS, {
   title: "My back-office",
@@ -53,7 +53,7 @@ The shell is just a **default**. For your own chrome, inject it — the kit's
 pages will render their content inside:
 
 ```ts
-import { FORGE_LAYOUT, ForgeBareLayout } from "@/layout"
+import { FORGE_LAYOUT, ForgeBareLayout } from "@forge/layout"
 
 app.provide(FORGE_LAYOUT, MyLayout)         // your full chrome
 // or: app.provide(FORGE_LAYOUT, ForgeBareLayout)  // no chrome (passthrough)
@@ -69,7 +69,7 @@ The kit ships **no optional feature** (2FA, notifications, user menu…) — it
 exposes anchor points. An extension bundles them:
 
 ```ts
-import { installForgeExtensions } from "@/extensions"
+import { installForgeExtensions } from "@forge/extensions"
 
 installForgeExtensions(app, [
   {
@@ -104,8 +104,8 @@ Shell outlets: `header:start` (topbar, after the trigger), `header:end`
 field def:
 
 ```ts
-import { registerDisplay } from "@/fields"
-import { registerInput } from "@/inputs"
+import { registerDisplay } from "@forge/fields"
+import { registerInput } from "@forge/inputs"
 import RatingDisplay from "./RatingDisplay.vue"
 import RatingInput from "./RatingInput.vue"
 
@@ -120,7 +120,7 @@ text("score", { display: "rating", input: "rating", editable: true })
 **Nav icons** — the server sends a *name*, the frontend resolves it:
 
 ```ts
-import { registerNavIcon } from "@/nav"
+import { registerNavIcon } from "@forge/nav"
 import { PhGauge } from "@phosphor-icons/vue"
 
 registerNavIcon("gauge", PhGauge)
@@ -148,7 +148,7 @@ variable names) + `@import "tailwindcss"` + `@source` pointing at the kit.
 
 ## The primitives
 
-The kit exposes all of its primitives (`@/primitives/*`) — button, table,
+The kit exposes all of its primitives (`@forge/primitives/*`) — button, table,
 card, badge, dialogs, sidebar… Your custom pages compose them to stay visually
 consistent with the CRUD: same design tokens, same dark mode, zero CSS to
 write. **Every component has its own page** in the

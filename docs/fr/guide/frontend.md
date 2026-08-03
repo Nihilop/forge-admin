@@ -11,7 +11,7 @@ Le moteur rend des pages nommées `forge/ResourceIndex|Show|Form` ; vos pages
 custom ont des noms libres (`Dashboard`…). Le resolver duale les deux :
 
 ```ts
-import { FORGE_PAGE_NS } from "@/brand"
+import { FORGE_PAGE_NS } from "@forge/brand"
 
 resolve: (name) => {
   const isForge = name.startsWith(`${FORGE_PAGE_NS}/`)
@@ -35,7 +35,7 @@ clair/sombre persisté, sélecteur de langue, responsive (drawer mobile) — et 
 Personnalisation par options :
 
 ```ts
-import { FORGE_SHELL_OPTIONS } from "@/shell/options"
+import { FORGE_SHELL_OPTIONS } from "@forge/shell/options"
 
 app.provide(FORGE_SHELL_OPTIONS, {
   title: "Mon back-office",
@@ -53,7 +53,7 @@ Le shell n'est qu'un **défaut**. Pour votre propre chrome, injectez-le — les
 pages du kit rendront leur contenu dedans :
 
 ```ts
-import { FORGE_LAYOUT, ForgeBareLayout } from "@/layout"
+import { FORGE_LAYOUT, ForgeBareLayout } from "@forge/layout"
 
 app.provide(FORGE_LAYOUT, MonLayout)        // votre chrome complet
 // ou : app.provide(FORGE_LAYOUT, ForgeBareLayout)  // aucun chrome (passthrough)
@@ -69,7 +69,7 @@ Le kit n'embarque **aucune feature optionnelle** (2FA, notifications, menu
 user…) — il expose des points d'ancrage. Une extension les regroupe :
 
 ```ts
-import { installForgeExtensions } from "@/extensions"
+import { installForgeExtensions } from "@forge/extensions"
 
 installForgeExtensions(app, [
   {
@@ -104,8 +104,8 @@ l'option `extensions` de la [façade](facade).
 nom dans la def du champ :
 
 ```ts
-import { registerDisplay } from "@/fields"
-import { registerInput } from "@/inputs"
+import { registerDisplay } from "@forge/fields"
+import { registerInput } from "@forge/inputs"
 import RatingDisplay from "./RatingDisplay.vue"
 import RatingInput from "./RatingInput.vue"
 
@@ -120,7 +120,7 @@ text("score", { display: "rating", input: "rating", editable: true })
 **Icônes de nav** — le serveur envoie un *nom*, le front le résout :
 
 ```ts
-import { registerNavIcon } from "@/nav"
+import { registerNavIcon } from "@forge/nav"
 import { PhGauge } from "@phosphor-icons/vue"
 
 registerNavIcon("gauge", PhGauge)
@@ -149,7 +149,7 @@ propres tokens (mêmes noms de variables) + `@import "tailwindcss"` +
 
 ## Les primitives
 
-Le kit expose toutes ses primitives (`@/primitives/*`) — button, table, card,
+Le kit expose toutes ses primitives (`@forge/primitives/*`) — button, table, card,
 badge, dialogs, sidebar… Vos pages custom les composent pour rester
 visuellement cohérentes avec le CRUD : mêmes design tokens, même dark mode,
 zéro CSS à écrire. **Chaque composant a sa page** dans la rubrique

@@ -5,7 +5,7 @@
 // en pied (`sidebar:footer`).
 import { computed } from "vue"
 import { Link, usePage } from "@inertiajs/vue3"
-import type { SidebarProps } from "@/primitives/sidebar"
+import type { SidebarProps } from "@forge/primitives/sidebar"
 import {
   Sidebar,
   SidebarContent,
@@ -17,8 +17,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/primitives/sidebar"
-import { type ForgeNavEntry, navIcon } from "@/nav"
+} from "@forge/primitives/sidebar"
+import { type ForgeNavEntry, navIcon } from "@forge/nav"
 import { useForgeShellOptions } from "../shell/options"
 import ForgeOutlet from "../shell/ForgeOutlet.vue"
 

@@ -4,7 +4,7 @@ The base container for pages — CRUD detail views, dashboard stat tiles.
 
 ```vue
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/primitives/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@forge/primitives/card"
 </script>
 
 <template>

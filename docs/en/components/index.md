@@ -11,9 +11,9 @@ writing CSS**.
 Each primitive is imported from its folder:
 
 ```ts
-import { Button } from "@/primitives/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/primitives/card"
-import { confirmAction } from "@/confirm"
+import { Button } from "@forge/primitives/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@forge/primitives/card"
+import { confirmAction } from "@forge/confirm"
 ```
 
 (`@` = the kit root — the alias configured in your Vite/tsconfig.)

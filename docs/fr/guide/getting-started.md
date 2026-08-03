@@ -93,8 +93,8 @@ entrée les résout depuis le kit et injecte votre layout :
 // src/main.ts
 import { createApp, h } from "vue"
 import { createInertiaApp } from "@inertiajs/vue3"
-import { createForgeI18n } from "@/i18n"
-import { FORGE_PAGE_NS } from "@/brand"
+import { createForgeI18n } from "@forge/i18n"
+import { FORGE_PAGE_NS } from "@forge/brand"
 
 createInertiaApp({
   resolve: (name) => {
@@ -115,6 +115,22 @@ createInertiaApp({
   },
 })
 ```
+
+::: tip Alias `@forge` requis
+Les imports du kit (`@forge/i18n`, `@forge/brand`…) reposent sur un alias à
+déclarer dans VOTRE projet — dédié (`@forge`) pour ne jamais entrer en
+collision avec le `@` de votre propre code :
+
+```ts
+// vite.config.ts
+resolve: { alias: { "@forge": path.resolve(__dirname, "chemin/vers/forge/ui") } }
+```
+
+```json
+// tsconfig.json (compilerOptions)
+"paths": { "@forge/*": ["./chemin/vers/forge/ui/*"] }
+```
+:::
 
 Et les **styles** : une ligne. Le kit fournit sa feuille tout-en-un (Tailwind,
 design system light/dark, polices) — le build Vite de VOTRE projet génère le

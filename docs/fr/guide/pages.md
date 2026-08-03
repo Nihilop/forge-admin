@@ -50,9 +50,9 @@ cherchera hors du namespace Forge (voir [Kit frontend](frontend)).
 <!-- src/pages/Dashboard.vue -->
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3"
-import { Card, CardContent } from "@/primitives/card"
-import { useForgeLayout } from "@/layout"
-import { useForgePrefix } from "@/prefix"
+import { Card, CardContent } from "@forge/primitives/card"
+import { useForgeLayout } from "@forge/layout"
+import { useForgePrefix } from "@forge/prefix"
 
 const Layout = useForgeLayout()      // votre chrome, injecté
 const prefix = useForgePrefix()      // jamais de "/admin" en dur

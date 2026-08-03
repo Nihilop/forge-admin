@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
 import { PanelLeft } from "@lucide/vue"
-import { cn } from "@/lib/utils"
-import { Button } from '@/primitives/button'
+import { cn } from "@forge/lib/utils"
+import { Button } from '@forge/primitives/button'
 import { useSidebar } from "./utils"
 
 const props = defineProps<{

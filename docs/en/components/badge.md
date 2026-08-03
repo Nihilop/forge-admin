@@ -5,7 +5,7 @@ The kit's **semantic-tone** badge — exactly the rendering of the CRUD's
 
 ```vue
 <script setup lang="ts">
-import { Badge } from "@/primitives/badge"
+import { Badge } from "@forge/primitives/badge"
 </script>
 
 <template>

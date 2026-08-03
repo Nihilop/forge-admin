@@ -5,8 +5,8 @@ Case à cocher à `v-model` (booléen).
 ```vue
 <script setup lang="ts">
 import { ref } from "vue"
-import { Checkbox } from "@/primitives/checkbox"
-import { Label } from "@/primitives/label"
+import { Checkbox } from "@forge/primitives/checkbox"
+import { Label } from "@forge/primitives/label"
 
 const accepted = ref(false)
 </script>

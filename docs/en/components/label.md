@@ -4,8 +4,8 @@ Accessible field label (associated via `for`/`id`).
 
 ```vue
 <script setup lang="ts">
-import { Label } from "@/primitives/label"
-import { Input } from "@/primitives/input"
+import { Label } from "@forge/primitives/label"
+import { Input } from "@forge/primitives/input"
 </script>
 
 <template>

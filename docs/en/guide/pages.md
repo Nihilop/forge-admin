@@ -50,9 +50,9 @@ look it up outside the Forge namespace (see [Frontend kit](frontend)).
 <!-- src/pages/Dashboard.vue -->
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3"
-import { Card, CardContent } from "@/primitives/card"
-import { useForgeLayout } from "@/layout"
-import { useForgePrefix } from "@/prefix"
+import { Card, CardContent } from "@forge/primitives/card"
+import { useForgeLayout } from "@forge/layout"
+import { useForgePrefix } from "@forge/prefix"
 
 const Layout = useForgeLayout()      // your chrome, injected
 const prefix = useForgePrefix()      // never a hardcoded "/admin"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Input } from "@/primitives/input"
+import { Input } from "@forge/primitives/input"
 import type { PublicField } from "../fields"
 
 const model = defineModel<string>()

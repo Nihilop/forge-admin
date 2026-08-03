@@ -4,7 +4,7 @@
 // via le contrat ForgeAdapter (adapter.ts). Ne dépend que de Hono.
 
 import { type Context, Hono } from "hono"
-import { getResource, type ResourceDef } from "./resource.ts"
+import { forgeNav, getResource, type ResourceDef } from "./resource.ts"
 import { type Field, publicField } from "./field.ts"
 import { forgePage } from "./brand.ts"
 import { setForgePrefix } from "./prefix.ts"
@@ -197,6 +197,13 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
       backHref: `${prefix}/${p.name}/${scope.parentId}`,
     }
   }
+
+  // ── Racine du CRUD (`GET <prefix>`) : redirige vers la première entrée de
+  // nav du périmètre — cible sûre pour un login ou un lien nu vers l'admin. ──
+  app.get("/", (c) => {
+    const first = forgeNav().find((e) => e.href.startsWith(`${prefix}/`))
+    return ctx.redirect(first?.href ?? "/")
+  })
 
   // ── Liste ──
   app.get("/:resource", async (c) => {

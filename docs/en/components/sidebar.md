@@ -10,7 +10,7 @@ import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader,
   SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarProvider, SidebarTrigger,
-} from "@/primitives/sidebar"
+} from "@forge/primitives/sidebar"
 </script>
 
 <template>

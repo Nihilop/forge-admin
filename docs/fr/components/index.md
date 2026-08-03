@@ -11,9 +11,9 @@ visuellement homogène (mêmes tokens, même dark mode, même densité) **sans
 Chaque primitive s'importe depuis son dossier :
 
 ```ts
-import { Button } from "@/primitives/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/primitives/card"
-import { confirmAction } from "@/confirm"
+import { Button } from "@forge/primitives/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@forge/primitives/card"
+import { confirmAction } from "@forge/confirm"
 ```
 
 (`@` = la racine du kit — l'alias configuré dans votre Vite/tsconfig.)

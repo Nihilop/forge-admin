@@ -9,8 +9,8 @@ import { ref } from "vue"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,
   DialogTitle, DialogTrigger,
-} from "@/primitives/dialog"
-import { Button } from "@/primitives/button"
+} from "@forge/primitives/dialog"
+import { Button } from "@forge/primitives/button"
 
 const open = ref(false)
 </script>

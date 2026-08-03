@@ -7,7 +7,7 @@ Liste déroulante — celle des filtres facettés et des champs `select`/`badge`
 import { ref } from "vue"
 import {
   Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
-} from "@/primitives/select"
+} from "@forge/primitives/select"
 
 const status = ref("all")
 </script>

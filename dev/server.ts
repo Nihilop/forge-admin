@@ -25,14 +25,17 @@ definePage({
   exact: true,
 })
 
-// ── La façade : Hono + Inertia + CRUD + assets, avec des défauts partout. ──
+// ── La façade : Hono + Inertia + CRUD + assets + AUTH BUILTIN. ──
+// Le playground utilise l'auth réelle (login, sessions, rôles) — identifiants
+// de démo seedés au boot (PGlite en mémoire → recréés à chaque démarrage).
 const admin = forge({
   db: { query }, // PGlite de l'app ; en prod réelle : db: DATABASE_URL
-  permissions: "open", // démo : tout autorisé (dérivé du registre)
+  auth: { seed: { email: "admin@forge.dev", password: "forge-dev", name: "Admin" } },
   prefix: ADMIN_PREFIX,
   title: "Forge — dev",
   lang: "fr",
 })
+console.log("Login démo → admin@forge.dev / forge-dev")
 
 // ── Les routes de l'APP (Forge ne les connaît pas). ──
 

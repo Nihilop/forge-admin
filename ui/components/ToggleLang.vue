@@ -2,14 +2,14 @@
 // Sélecteur de langue du shell (affiché si plusieurs locales i18n, persisté).
 import { useI18n } from "vue-i18n"
 import { PhTranslate } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
+import { Button } from "@forge/primitives/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/primitives/dropdown-menu"
-import { FORGE_STORAGE_NS } from "@/brand"
+} from "@forge/primitives/dropdown-menu"
+import { FORGE_STORAGE_NS } from "@forge/brand"
 import { useForgeShellOptions } from "../shell/options"
 
 const options = useForgeShellOptions()

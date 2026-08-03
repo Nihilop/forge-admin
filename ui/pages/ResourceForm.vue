@@ -2,16 +2,16 @@
 import { computed } from "vue"
 import { Link } from "@inertiajs/vue3"
 import { PhArrowLeft } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
-import { Label } from "@/primitives/label"
-import { Card, CardContent } from "@/primitives/card"
-import { useForgeLayout } from "@/layout"
+import { Button } from "@forge/primitives/button"
+import { Label } from "@forge/primitives/label"
+import { Card, CardContent } from "@forge/primitives/card"
+import { useForgeLayout } from "@forge/layout"
 const Layout = useForgeLayout()
-import { inputFor } from "@/inputs"
-import { useResourceForm } from "@/composables/useResourceForm"
-import type { PublicField } from "@/fields"
-import { useForgePrefix } from "@/prefix"
-import { useForgeT } from "@/i18n"
+import { inputFor } from "@forge/inputs"
+import { useResourceForm } from "@forge/composables/useResourceForm"
+import type { PublicField } from "@forge/fields"
+import { useForgePrefix } from "@forge/prefix"
+import { useForgeT } from "@forge/i18n"
 const t = useForgeT()
 const prefix = useForgePrefix()
 

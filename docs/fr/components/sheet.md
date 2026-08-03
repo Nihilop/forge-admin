@@ -7,8 +7,8 @@ formulaires contextuels.
 <script setup lang="ts">
 import {
   Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/primitives/sheet"
-import { Button } from "@/primitives/button"
+} from "@forge/primitives/sheet"
+import { Button } from "@forge/primitives/button"
 </script>
 
 <template>

@@ -7,7 +7,7 @@ Fil d'ariane — idéal dans le slot `header-start` du shell.
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/primitives/breadcrumb"
+} from "@forge/primitives/breadcrumb"
 import { Link } from "@inertiajs/vue3"
 </script>
 

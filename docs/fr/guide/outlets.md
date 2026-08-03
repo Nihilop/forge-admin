@@ -25,7 +25,7 @@ installForgeExtensions(app, [
 ], { i18n })
 
 // 2. Directement :
-import { registerShellItem } from "@/shell/registry"
+import { registerShellItem } from "@forge/shell/registry"
 registerShellItem("sidebar:footer", UserMenu)
 ```
 
@@ -40,7 +40,7 @@ avec les extensions) comme dans le shell par défaut si vous l'étendez :
 
 ```vue
 <script setup lang="ts">
-import ForgeOutlet from "@/shell/ForgeOutlet.vue"
+import ForgeOutlet from "@forge/shell/ForgeOutlet.vue"
 </script>
 
 <template>

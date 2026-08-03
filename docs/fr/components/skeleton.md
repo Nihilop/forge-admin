@@ -4,7 +4,7 @@ Placeholder de chargement (pulse) — dimensionnez-le avec des classes.
 
 ```vue
 <script setup lang="ts">
-import { Skeleton } from "@/primitives/skeleton"
+import { Skeleton } from "@forge/primitives/skeleton"
 </script>
 
 <template>

@@ -4,7 +4,7 @@ Le conteneur de base des pages — fiches du CRUD, stat tiles du dashboard.
 
 ```vue
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/primitives/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@forge/primitives/card"
 </script>
 
 <template>

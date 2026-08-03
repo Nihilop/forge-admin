@@ -5,8 +5,8 @@
 ```vue
 <script setup lang="ts">
 import { ref } from "vue"
-import { Input } from "@/primitives/input"
-import { Label } from "@/primitives/label"
+import { Input } from "@forge/primitives/input"
+import { Label } from "@forge/primitives/label"
 
 const email = ref("")
 </script>

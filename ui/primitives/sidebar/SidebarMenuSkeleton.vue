@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
 import { computed } from "vue"
-import { cn } from "@/lib/utils"
-import { Skeleton } from '@/primitives/skeleton'
+import { cn } from "@forge/lib/utils"
+import { Skeleton } from '@forge/primitives/skeleton'
 
 const props = defineProps<{
   showIcon?: boolean

@@ -7,7 +7,7 @@ Breadcrumb trail — ideal in the shell's `header-start` slot.
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/primitives/breadcrumb"
+} from "@forge/primitives/breadcrumb"
 import { Link } from "@inertiajs/vue3"
 </script>
 

@@ -7,10 +7,10 @@
 // Mesure : un « ghost » hors-flux, invisible, rend TOUS les items → on lit leurs
 // largeurs réelles et on calcule combien tiennent (en réservant la place du « … »).
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/primitives/dropdown-menu"
-import { Button } from "@/primitives/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@forge/primitives/dropdown-menu"
+import { Button } from "@forge/primitives/button"
 import { PhDotsThree } from "@phosphor-icons/vue"
-import { useForgeT } from "@/i18n"
+import { useForgeT } from "@forge/i18n"
 const t = useForgeT()
 
 const props = withDefaults(

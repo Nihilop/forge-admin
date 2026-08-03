@@ -15,8 +15,8 @@ import { ref } from "vue"
 import {
   AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
-} from "@/primitives/alert-dialog"
-import { Button } from "@/primitives/button"
+} from "@forge/primitives/alert-dialog"
+import { Button } from "@forge/primitives/button"
 
 const open = ref(false)
 </script>

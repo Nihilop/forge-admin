@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/primitives/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@forge/primitives/select"
 import type { PublicField } from "../fields"
 
 const model = defineModel<string>()

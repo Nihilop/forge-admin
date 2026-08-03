@@ -2,21 +2,21 @@
 import { type Component, computed, ref } from "vue"
 import { Link, router } from "@inertiajs/vue3"
 import { PhArrowLeft, PhPencilSimple, PhPlus, PhTrash } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
-import { Card, CardContent } from "@/primitives/card"
+import { Button } from "@forge/primitives/button"
+import { Card, CardContent } from "@forge/primitives/card"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/primitives/table"
-import { DropdownMenuItem } from "@/primitives/dropdown-menu"
-import OverflowRow from "@/OverflowRow.vue"
-import ConfirmDialog from "@/components/ConfirmDialog.vue"
-import { confirmAction } from "@/confirm"
-import { useForgeLayout } from "@/layout"
+} from "@forge/primitives/table"
+import { DropdownMenuItem } from "@forge/primitives/dropdown-menu"
+import OverflowRow from "@forge/OverflowRow.vue"
+import ConfirmDialog from "@forge/components/ConfirmDialog.vue"
+import { confirmAction } from "@forge/confirm"
+import { useForgeLayout } from "@forge/layout"
 const Layout = useForgeLayout()
-import { displayFor, type PublicField } from "@/fields"
-import { navIcon } from "@/nav"
-import { useForgePrefix } from "@/prefix"
-import { useForgeT } from "@/i18n"
+import { displayFor, type PublicField } from "@forge/fields"
+import { navIcon } from "@forge/nav"
+import { useForgePrefix } from "@forge/prefix"
+import { useForgeT } from "@forge/i18n"
 const t = useForgeT()
 const prefix = useForgePrefix()
 

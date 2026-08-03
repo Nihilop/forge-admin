@@ -5,9 +5,9 @@
 // outlets d'extension (`header:start`, `header:end`) + langue et thème.
 // C'est le fallback de FORGE_LAYOUT : un hôte peut toujours fournir son
 // propre chrome via provide(FORGE_LAYOUT, …).
-import { Separator } from "@/primitives/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/primitives/sidebar"
-import { SIDEBAR_COOKIE_NAME } from "@/primitives/sidebar/utils"
+import { Separator } from "@forge/primitives/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@forge/primitives/sidebar"
+import { SIDEBAR_COOKIE_NAME } from "@forge/primitives/sidebar/utils"
 import AdminSidebar from "../components/AdminSidebar.vue"
 import ToggleLang from "../components/ToggleLang.vue"
 import ToggleTheme from "../components/ToggleTheme.vue"

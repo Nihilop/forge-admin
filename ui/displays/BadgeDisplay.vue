@@ -3,7 +3,7 @@
 // l'option correspondante (source unique du rendu badge).
 import { computed } from "vue"
 import type { PublicField } from "../fields"
-import { Badge, type BadgeTone } from "@/primitives/badge"
+import { Badge, type BadgeTone } from "@forge/primitives/badge"
 
 const props = defineProps<{ value: unknown; field: PublicField }>()
 

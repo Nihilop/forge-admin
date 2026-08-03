@@ -27,7 +27,8 @@ Deno.serve(admin.fetch)
 | Option | Default | Role |
 |---|---|---|
 | `db` | — | **Required.** Postgres URL, `{ query }`, or a `ForgeAdapter` — see below. |
-| `permissions` | — | **Required.** `"open"` (dev), a static list, or a resolver — see [Permissions](permissions). |
+| `permissions` | — | **Required** (unless `auth` is active). `"open"` (dev), a static list, or a resolver — see [Permissions](permissions). |
+| `auth` | — | Built-in auth: `true` or `AuthOptions` (seed, sessions, roles). Provides the permission resolver — see [Authentication](auth). |
 | `prefix` | `/admin` | CRUD mount prefix. Every generated URL derives from it. |
 | `entry` | `src/main.ts` | Vite frontend entry. |
 | `title` / `lang` | `Admin` / `en` | The `<title>` and `lang` attribute of the default HTML template. |

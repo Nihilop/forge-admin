@@ -6,8 +6,8 @@ les suppressions et les actions à `confirm` du CRUD.
 
 ```vue
 <script setup lang="ts">
-import ConfirmDialog from "@/components/ConfirmDialog.vue"
-import { confirmAction } from "@/confirm"
+import ConfirmDialog from "@forge/components/ConfirmDialog.vue"
+import { confirmAction } from "@forge/confirm"
 
 async function archive() {
   if (await confirmAction("Archiver ce projet ?")) {

@@ -6,7 +6,7 @@ The data table — behind CRUD lists and `hasMany` sections.
 <script setup lang="ts">
 import {
   Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow,
-} from "@/primitives/table"
+} from "@forge/primitives/table"
 
 const rows = [{ id: 1, name: "Keyboard", status: "Active" }]
 </script>

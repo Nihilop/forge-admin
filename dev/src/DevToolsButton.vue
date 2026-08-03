@@ -3,7 +3,7 @@
 // installForgeExtensions (voir main.ts). Prouve le point d'ancrage : une vraie
 // feature optionnelle (2FA, notifications…) se brancherait exactement pareil.
 import { PhGithubLogo } from "@phosphor-icons/vue"
-import { Button } from "@/primitives/button"
+import { Button } from "@forge/primitives/button"
 </script>
 
 <template>

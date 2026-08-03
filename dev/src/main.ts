@@ -1,11 +1,12 @@
 import { createApp, h } from "vue"
 import { createInertiaApp } from "@inertiajs/vue3"
 import "./style.css"
-import { createForgeI18n } from "@/i18n"
-import { FORGE_PAGE_NS, FORGE_STORAGE_NS } from "@/brand"
-import { FORGE_SHELL_OPTIONS } from "@/shell/options"
-import { installForgeExtensions } from "@/extensions"
+import { createForgeI18n } from "@forge/i18n"
+import { FORGE_PAGE_NS, FORGE_STORAGE_NS } from "@forge/brand"
+import { FORGE_SHELL_OPTIONS } from "@forge/shell/options"
+import { installForgeExtensions } from "@forge/extensions"
 import DevToolsButton from "./DevToolsButton.vue"
+import LogoutButton from "./LogoutButton.vue"
 
 // i18n de Forge (fr/en). Langue initiale = préférence persistée, sinon fr.
 const i18n = createForgeI18n({ locale: localStorage.getItem(`${FORGE_STORAGE_NS}:locale`) ?? "fr" })
@@ -38,7 +39,10 @@ createInertiaApp({
     // optionnelle (2FA…) se brancherait exactement ainsi (outlets, inputs,
     // icônes, messages i18n…).
     installForgeExtensions(app, [
-      { name: "dev-tools", outlets: { "header:end": DevToolsButton } },
+      {
+        name: "dev-tools",
+        outlets: { "header:end": DevToolsButton, "sidebar:footer": LogoutButton },
+      },
     ], { i18n })
 
     app.mount(el)
