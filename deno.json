@@ -1,7 +1,7 @@
 {
   "//": "Forge — framework d'admin (engine Deno/Hono + kit Vue ui/ + harnais dev à la racine). Un seul node_modules (racine) → le kit ui/ résout ses deps npm.",
   "name": "@streemkit/forge",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "license": "MIT",
   "exports": {
     ".": "./admin/mod.ts",
@@ -33,7 +33,7 @@
     "serve": "cd dev && PROD_MODE=1 deno run -A server.ts",
     "check": "deno check dev/server.ts",
     "test": "deno test -A engine admin",
-    "docs": "npx vitepress dev docs",
+    "docs": "npx vitepress dev docs --port 1337",
     "docs:build": "npx vitepress build docs",
     "docs:serve": "deno run -A docs/serve.ts"
   },

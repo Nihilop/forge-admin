@@ -38,6 +38,8 @@ export default {
     },
     confirm: {
       delete: "Delete this item?",
+      cancel: "Cancel",
+      confirm: "Confirm",
     },
   },
 }

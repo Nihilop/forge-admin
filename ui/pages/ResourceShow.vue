@@ -9,6 +9,8 @@ import {
 } from "@/primitives/table"
 import { DropdownMenuItem } from "@/primitives/dropdown-menu"
 import OverflowRow from "@/OverflowRow.vue"
+import ConfirmDialog from "@/components/ConfirmDialog.vue"
+import { confirmAction } from "@/confirm"
 import { useForgeLayout } from "@/layout"
 const Layout = useForgeLayout()
 import { displayFor, type PublicField } from "@/fields"
@@ -67,15 +69,18 @@ const visibleSections = computed(() =>
   props.tabs ? (props.hasMany ?? []).filter((hm) => hm.key === activeTab.value) : (props.hasMany ?? []),
 )
 
-function remove() {
-  if (confirm(t("confirm.delete"))) {
+async function remove() {
+  if (await confirmAction(t("confirm.delete"))) {
     router.post(`${prefix}/${props.resource.name}/${props.row.id}/delete`)
   }
 }
 
-function fire(a: ActionMeta) {
-  if (a.link) { router.visit(a.href); return }
-  if (a.confirm && !confirm(a.confirm)) return
+async function fire(a: ActionMeta) {
+  if (a.link) {
+    router.visit(a.href)
+    return
+  }
+  if (a.confirm && !(await confirmAction(a.confirm))) return
   router.post(a.href, a.data ?? {})
 }
 
@@ -120,6 +125,7 @@ const tabClass = (key: string) =>
 
 <template>
   <component :is="Layout">
+    <ConfirmDialog />
     <template #header-start>
       <Link
         :href="`${prefix}/${resource.name}`"

@@ -17,6 +17,8 @@ import {
 import {
   Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow,
 } from "@/primitives/table"
+import ConfirmDialog from "@/components/ConfirmDialog.vue"
+import { confirmAction } from "@/confirm"
 import { useForgeLayout } from "@/layout"
 const Layout = useForgeLayout()
 import { displayFor, type PublicField } from "@/fields"
@@ -73,21 +75,25 @@ const filterableFields = computed(() => props.resource.fields.filter((f) => f.op
 const from = computed(() => props.pagination ? (props.pagination.page - 1) * props.pagination.per + 1 : 1)
 const to = computed(() => props.pagination ? Math.min(props.pagination.page * props.pagination.per, props.pagination.total) : props.rows.length)
 
-function remove(row: Record<string, unknown>) {
-  if (confirm(t("confirm.delete"))) {
+async function remove(row: Record<string, unknown>) {
+  if (await confirmAction(t("confirm.delete"))) {
     router.post(`${prefix}/${props.resource.name}/${row.id}/delete`)
   }
 }
 
-function fireListAction(a: ListAction) {
-  if (a.link) { router.visit(a.href); return }
-  if (a.confirm && !confirm(a.confirm)) return
+async function fireListAction(a: ListAction) {
+  if (a.link) {
+    router.visit(a.href)
+    return
+  }
+  if (a.confirm && !(await confirmAction(a.confirm))) return
   router.post(a.href, a.data ?? {})
 }
 </script>
 
 <template>
   <component :is="Layout">
+    <ConfirmDialog />
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 class="text-2xl">{{ resource.label }}</h1>

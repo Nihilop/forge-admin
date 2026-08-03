@@ -39,6 +39,8 @@ export default {
     },
     confirm: {
       delete: "Supprimer cet élément ?",
+      cancel: "Annuler",
+      confirm: "Confirmer",
     },
   },
 }

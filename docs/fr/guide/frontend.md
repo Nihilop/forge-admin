@@ -149,15 +149,11 @@ propres tokens (mêmes noms de variables) + `@import "tailwindcss"` +
 
 ## Les primitives
 
-Le kit expose ses primitives (`@/primitives/*`) : `button`, `input`, `select`,
-`table`, `card`, `badge`, `dialog`, `dropdown-menu`, `checkbox`, `switch`,
-`textarea`, `tooltip`, `separator`, `scroll-area`, `sonner` (toasts)… Vos pages
-custom les composent pour rester visuellement cohérentes avec le CRUD — mêmes
-design tokens, même dark mode.
-
-`OverflowRow` mérite une mention : une rangée responsive « priority+ » qui
-pousse les éléments qui débordent dans un menu « … » — le kit l'utilise pour
-les boutons d'en-tête de fiche et les onglets.
+Le kit expose toutes ses primitives (`@/primitives/*`) — button, table, card,
+badge, dialogs, sidebar… Vos pages custom les composent pour rester
+visuellement cohérentes avec le CRUD : mêmes design tokens, même dark mode,
+zéro CSS à écrire. **Chaque composant a sa page** dans la rubrique
+[Composants](../components/), avec import, exemple et API.
 
 ## Utiliser le kit sans le moteur ?
 

@@ -5,6 +5,75 @@
 
 import { defineConfig } from "vitepress"
 
+/** Pages composants, groupées par famille (mêmes slugs dans les 2 locales). */
+const componentGroups = (p: string, labels: {
+  actions: string
+  forms: string
+  display: string
+  overlays: string
+  nav: string
+  kit: string
+}) => [
+  {
+    text: labels.actions,
+    collapsed: true,
+    items: [
+      { text: "Button", link: `${p}/button` },
+      { text: "DropdownMenu", link: `${p}/dropdown-menu` },
+    ],
+  },
+  {
+    text: labels.forms,
+    collapsed: true,
+    items: [
+      { text: "Input", link: `${p}/input` },
+      { text: "Textarea", link: `${p}/textarea` },
+      { text: "Select", link: `${p}/select` },
+      { text: "Checkbox", link: `${p}/checkbox` },
+      { text: "Switch", link: `${p}/switch` },
+      { text: "Label", link: `${p}/label` },
+    ],
+  },
+  {
+    text: labels.display,
+    collapsed: true,
+    items: [
+      { text: "Badge", link: `${p}/badge` },
+      { text: "Card", link: `${p}/card` },
+      { text: "Table", link: `${p}/table` },
+      { text: "Skeleton", link: `${p}/skeleton` },
+      { text: "Separator", link: `${p}/separator` },
+      { text: "Tooltip", link: `${p}/tooltip` },
+    ],
+  },
+  {
+    text: labels.overlays,
+    collapsed: true,
+    items: [
+      { text: "Dialog", link: `${p}/dialog` },
+      { text: "AlertDialog", link: `${p}/alert-dialog` },
+      { text: "Sheet", link: `${p}/sheet` },
+      { text: "Sonner (toasts)", link: `${p}/sonner` },
+    ],
+  },
+  {
+    text: labels.nav,
+    collapsed: true,
+    items: [
+      { text: "Sidebar", link: `${p}/sidebar` },
+      { text: "Breadcrumb", link: `${p}/breadcrumb` },
+    ],
+  },
+  {
+    text: labels.kit,
+    collapsed: true,
+    items: [
+      { text: "ConfirmDialog", link: `${p}/confirm-dialog` },
+      { text: "OverflowRow", link: `${p}/overflow-row` },
+    ],
+  },
+]
+
 const guideEn = [
   {
     text: "Start here",
@@ -28,8 +97,23 @@ const guideEn = [
       { text: "The forge() facade", link: "/guide/facade" },
       { text: "Bare engine & adapters", link: "/guide/engine" },
       { text: "Frontend kit", link: "/guide/frontend" },
+      { text: "Outlets", link: "/guide/outlets" },
       { text: "Internationalization", link: "/guide/i18n" },
       { text: "Deploying", link: "/guide/deploy" },
+    ],
+  },
+  {
+    text: "Components",
+    items: [
+      { text: "Overview", link: "/components/" },
+      ...componentGroups("/components", {
+        actions: "Actions",
+        forms: "Forms",
+        display: "Display",
+        overlays: "Overlays",
+        nav: "Navigation",
+        kit: "Kit",
+      }),
     ],
   },
 ]
@@ -57,8 +141,23 @@ const guideFr = [
       { text: "La façade forge()", link: "/fr/guide/facade" },
       { text: "Moteur nu & adapters", link: "/fr/guide/engine" },
       { text: "Kit frontend", link: "/fr/guide/frontend" },
+      { text: "Outlets", link: "/fr/guide/outlets" },
       { text: "Internationalisation", link: "/fr/guide/i18n" },
       { text: "Déployer", link: "/fr/guide/deploy" },
+    ],
+  },
+  {
+    text: "Composants",
+    items: [
+      { text: "Vue d'ensemble", link: "/fr/components/" },
+      ...componentGroups("/fr/components", {
+        actions: "Actions",
+        forms: "Formulaires",
+        display: "Affichage",
+        overlays: "Surcouches",
+        nav: "Navigation",
+        kit: "Kit",
+      }),
     ],
   },
 ]
@@ -85,7 +184,7 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: "Guide", link: "/guide/getting-started" },
-          { text: "Integration", link: "/guide/facade" },
+          { text: "Components", link: "/components/" },
         ],
         sidebar: guideEn,
         outline: { label: "On this page" },
@@ -99,7 +198,7 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: "Guide", link: "/fr/guide/getting-started" },
-          { text: "Intégration", link: "/fr/guide/facade" },
+          { text: "Composants", link: "/fr/components/" },
         ],
         sidebar: guideFr,
         outline: { label: "Sur cette page" },
