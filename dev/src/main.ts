@@ -1,6 +1,5 @@
 import { createApp, h } from "vue"
 import { createInertiaApp } from "@inertiajs/vue3"
-import { PhGauge, PhPackage, PhReceipt, PhRocketLaunch } from "@phosphor-icons/vue"
 import "./style.css"
 import { createForgeI18n } from "@/i18n"
 import { FORGE_PAGE_NS, FORGE_STORAGE_NS } from "@/brand"
@@ -35,14 +34,11 @@ createInertiaApp({
     // Personnalisation du shell par défaut (titre, sous-titre…).
     app.provide(FORGE_SHELL_OPTIONS, { title: "Forge", subtitle: "dev" })
 
-    // EXTENSION démo : icônes custom + un bouton dans l'outlet `header` du
-    // shell. Une feature optionnelle (2FA…) se brancherait exactement ainsi.
+    // EXTENSION démo : un bouton dans l'outlet `header` du shell. Une feature
+    // optionnelle (2FA…) se brancherait exactement ainsi (outlets, inputs,
+    // icônes, messages i18n…).
     installForgeExtensions(app, [
-      {
-        name: "dev-tools",
-        icons: { gauge: PhGauge, rocket: PhRocketLaunch, package: PhPackage, receipt: PhReceipt },
-        outlets: { header: DevToolsButton },
-      },
+      { name: "dev-tools", outlets: { header: DevToolsButton } },
     ], { i18n })
 
     app.mount(el)

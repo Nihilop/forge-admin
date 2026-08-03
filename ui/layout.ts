@@ -6,7 +6,7 @@
 
 import { type Component, inject, type InjectionKey } from "vue"
 import ForgeShell from "./shell/ForgeShell.vue"
-import ForgeBareLayout from "./ForgeLayout.vue"
+import ForgeBareLayout from "./shell/BareLayout.vue"
 
 export const FORGE_LAYOUT: InjectionKey<Component> = Symbol("forge-layout")
 

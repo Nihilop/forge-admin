@@ -1,24 +1,20 @@
 // Forge · kit Vue — résolution des icônes de nav (le serveur envoie un NOM
-// d'icône ; le front le résout en composant). Carte intégrée pour les courantes
-// + registerNavIcon() pour les custom (escape hatch). Fallback : un point.
+// d'icône ; le front le résout en composant). Carte intégrée pour les usages
+// ADMIN courants + registerNavIcon() pour les custom (escape hatch, extensions).
+// Fallback : un point.
 
 import type { Component } from "vue"
 import {
-  PhAddressBook,
-  PhArrowsClockwise,
-  PhBlueprint,
-  PhBracketsAngle,
-  PhBriefcase,
   PhBuildings,
-  PhDesktopTower,
   PhDotOutline,
   PhFileText,
+  PhGauge,
   PhGearSix,
   PhKey,
-  PhProhibit,
-  PhPulse,
+  PhPackage,
+  PhReceipt,
+  PhRocketLaunch,
   PhShieldCheck,
-  PhSparkle,
   PhTable,
   PhUser,
   PhUsersThree,
@@ -35,24 +31,21 @@ export interface ForgeNavEntry {
   exact?: boolean
 }
 
+// Vocabulaire d'icônes GÉNÉRIQUE d'un back-office (dashboard, catalogue,
+// équipe, réglages…). Tout le reste passe par registerNavIcon().
 const builtin: Record<string, Component> = {
+  gauge: PhGauge,
   user: PhUser,
   users: PhUsersThree,
   building: PhBuildings,
-  device: PhDesktopTower,
+  package: PhPackage,
+  receipt: PhReceipt,
   table: PhTable,
+  file: PhFileText,
   gear: PhGearSix,
   key: PhKey,
-  contacts: PhAddressBook,
   shield: PhShieldCheck,
-  pulse: PhPulse,
-  prohibit: PhProhibit,
-  reactivate: PhArrowsClockwise,
-  blueprint: PhBlueprint,
-  position: PhBriefcase,
-  file: PhFileText,
-  sparkle: PhSparkle,
-  api: PhBracketsAngle,
+  rocket: PhRocketLaunch,
 }
 
 const custom = new Map<string, Component>()
