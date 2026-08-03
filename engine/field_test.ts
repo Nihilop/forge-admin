@@ -40,7 +40,9 @@ Deno.test("field · publicField : ne fuit PAS les détails serveur (column/write
     permission: "customers.kyc.write",
     editable: true,
   })
-  const pub = publicField(f) as Record<string, unknown>
+  // Cast volontaire vers un index-signature : on vérifie l'ABSENCE de clés
+  // (column/writeColumn/permission) que le type PublicField ne déclare pas.
+  const pub = publicField(f) as unknown as Record<string, unknown>
   assertEquals(pub.column, undefined)
   assertEquals(pub.writeColumn, undefined)
   assertEquals(pub.permission, undefined)

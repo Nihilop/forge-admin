@@ -5,7 +5,7 @@
 //   db: monAdapter            → un ForgeAdapter complet (autre stockage)
 
 import { Pool } from "@db/postgres"
-import { type ForgeAdapter, postgresAdapter, type Row } from "forge/engine"
+import { type ForgeAdapter, postgresAdapter, type Row } from "../engine/mod.ts"
 
 export type SqlExecutor = (sql: string, params?: unknown[]) => Promise<Row[]>
 

@@ -57,8 +57,11 @@ function humanize(k: string): string {
   return k.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase())
 }
 
-function make(type: FieldType) {
-  return (key: string, opts: Partial<Omit<Field, "key" | "type">> = {}): Field => ({
+/** Signature d'un helper de champ (`text`, `badge`…). */
+export type FieldFactory = (key: string, opts?: Partial<Omit<Field, "key" | "type">>) => Field
+
+function make(type: FieldType): FieldFactory {
+  return (key, opts = {}) => ({
     key,
     type,
     label: opts.label ?? humanize(key),
@@ -67,11 +70,11 @@ function make(type: FieldType) {
   })
 }
 
-export const text = make("text")
-export const email = make("email")
-export const select = make("select")
-export const badge = make("badge")
-export const date = make("date")
+export const text: FieldFactory = make("text")
+export const email: FieldFactory = make("email")
+export const select: FieldFactory = make("select")
+export const badge: FieldFactory = make("badge")
+export const date: FieldFactory = make("date")
 
 /** Champ belongsTo : FK vers une autre resource (affichée en lien, éditée en select). */
 export function belongsTo(
@@ -93,8 +96,23 @@ export function belongsTo(
   }
 }
 
+/** Forme « publique » d'un champ, envoyée au front (sans les détails serveur :
+ *  ni `column`/`writeColumn`, ni `permission`). */
+export interface PublicField {
+  key: string
+  type: FieldType
+  label: string
+  options?: FieldOption[]
+  display?: string
+  input?: string
+  editable: boolean
+  required: boolean
+  relation?: Relation
+  wide: boolean
+}
+
 /** Vue « publique » d'un champ envoyée au front (sans les détails serveur). */
-export function publicField(f: Field) {
+export function publicField(f: Field): PublicField {
   return {
     key: f.key,
     type: f.type,

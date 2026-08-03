@@ -28,6 +28,16 @@ jobs:
           deno-version: v2.x
           cache: true
 
+      # Le type-check couvre l'app exemple (dev/), qui résout ses deps npm
+      # (@electric-sql/pglite…) depuis node_modules → install nécessaire.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend deps
+        run: npm ci
+
       - name: Format
         run: deno fmt --check
 

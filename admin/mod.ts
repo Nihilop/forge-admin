@@ -20,7 +20,7 @@ import {
   DEFAULT_ADMIN_PREFIX,
   type ForgeContext,
   forgeNav,
-} from "forge/engine"
+} from "../engine/mod.ts"
 import { type DbOption, resolveDb } from "./db.ts"
 
 export { type DbOption, resolveDb, type SqlExecutor } from "./db.ts"
