@@ -38,7 +38,7 @@ createInertiaApp({
     // optionnelle (2FA…) se brancherait exactement ainsi (outlets, inputs,
     // icônes, messages i18n…).
     installForgeExtensions(app, [
-      { name: "dev-tools", outlets: { header: DevToolsButton } },
+      { name: "dev-tools", outlets: { "header:end": DevToolsButton } },
     ], { i18n })
 
     app.mount(el)

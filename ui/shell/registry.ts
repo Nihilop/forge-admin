@@ -4,8 +4,9 @@
 // n'embarque AUCUNE feature optionnelle : il expose des emplacements.
 //
 // Outlets fournis par ForgeShell :
-//   "header"          → à droite de la topbar (avant langue/thème)
-//   "sidebar:footer"  → bas de la sidebar (au-dessus des contrôles)
+//   "header:start"    → topbar, à droite du trigger sidebar
+//   "header:end"      → topbar, à droite (avant langue/thème)
+//   "sidebar:footer"  → pied de la sidebar
 //
 // L'enregistrement se fait AU BOOT (avant mount), via installForgeExtensions()
 // ou directement registerShellItem().

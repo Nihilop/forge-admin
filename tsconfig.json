@@ -1,0 +1,16 @@
+{
+  "//": "Config TS pour l'OUTILLAGE front (IDE/Volar, CLI shadcn-vue). Le build réel passe par Vite (alias @ → ui/ dans dev/vite.config.ts) ; Deno ignore ce fichier.",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./ui/*"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["ui/**/*", "dev/src/**/*"]
+}

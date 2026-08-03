@@ -83,9 +83,10 @@ installForgeExtensions(app, [
 ], { i18n })   // before app.mount()
 ```
 
-Shell outlets: `header` (right side of the topbar) and `sidebar:footer`
-(bottom of the sidebar). The **server** half of an extension (routes,
-resources, pages) goes through the [facade](facade)'s `extensions` option.
+Shell outlets: `header:start` (topbar, after the trigger), `header:end`
+(topbar, right side) and `sidebar:footer` (bottom of the sidebar). The
+**server** half of an extension (routes, resources, pages) goes through the
+[facade](facade)'s `extensions` option.
 
 ## The composables
 
