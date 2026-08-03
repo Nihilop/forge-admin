@@ -3,26 +3,19 @@
 // registerDisplay() et y opter avec `display: "<nom>"` sur un champ.
 
 import type { Component } from "vue"
+import type { PublicField as EnginePublicField } from "../engine/field.ts"
 import TextDisplay from "./displays/TextDisplay.vue"
 import BadgeDisplay from "./displays/BadgeDisplay.vue"
 import DateDisplay from "./displays/DateDisplay.vue"
 import RelationDisplay from "./displays/RelationDisplay.vue"
 import MarkdownDisplay from "./displays/MarkdownDisplay.vue"
 
-export interface PublicField {
-  key: string
-  type: string
-  label: string
-  options?: { value: string; label: string; tone?: string }[]
-  display?: string
-  input?: string
-  editable?: boolean
-  required?: boolean
-  relation?: { resource: string; column: string; labelField: string }
+/** La forme publique d'un champ, telle que le moteur l'envoie en props —
+ *  MÊME type que côté serveur (import type pur, zéro code runtime), enrichi
+ *  des drapeaux ajoutés par le moteur au rendu des formulaires. */
+export interface PublicField extends EnginePublicField {
   /** Champ à permission que l'opérateur n'a pas → saisie verrouillée (lecture seule). */
   locked?: boolean
-  /** Détail : affiché pleine largeur sous la grille d'infos (contenus longs). */
-  wide?: boolean
 }
 
 const byType: Record<string, Component> = {

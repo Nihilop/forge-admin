@@ -1,25 +1,17 @@
 <script setup lang="ts">
+// Display des champs `badge` — rend la primitive Badge du kit avec le tone de
+// l'option correspondante (source unique du rendu badge).
 import { computed } from "vue"
 import type { PublicField } from "../fields"
+import { Badge, type BadgeTone } from "@/primitives/badge"
 
 const props = defineProps<{ value: unknown; field: PublicField }>()
 
 const opt = computed(() => props.field.options?.find((o) => o.value === String(props.value)))
-
-const TONE: Record<string, string> = {
-  success: "bg-success/12 text-success",
-  warning: "bg-warning/15 text-warning",
-  danger: "bg-destructive/12 text-destructive",
-  primary: "bg-primary/12 text-primary",
-  muted: "bg-muted text-muted-foreground",
-}
 </script>
 
 <template>
-  <span
-    class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-    :class="TONE[opt?.tone ?? 'muted']"
-  >
+  <Badge :tone="(opt?.tone as BadgeTone | undefined) ?? 'muted'">
     {{ opt?.label ?? value ?? "—" }}
-  </span>
+  </Badge>
 </template>

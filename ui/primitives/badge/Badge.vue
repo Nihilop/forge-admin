@@ -1,27 +1,16 @@
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import type { BadgeVariants } from "."
-import { reactiveOmit } from "@vueuse/core"
-import { Primitive } from "reka-ui"
-import { cn } from "@/lib/utils"
-import { badgeVariants } from "."
+// Badge « tone » du kit — teinte sémantique douce (statuts, compteurs, chips).
+// C'est le rendu des champs `badge` du CRUD, exposé en primitive.
+import { badgeToneClasses, type BadgeTone } from "./tones"
 
-const props = defineProps<PrimitiveProps & {
-  variant?: BadgeVariants["variant"]
-  class?: HTMLAttributes["class"]
-}>()
-
-const delegatedProps = reactiveOmit(props, "class")
+const props = withDefaults(defineProps<{ tone?: BadgeTone }>(), { tone: "muted" })
 </script>
 
 <template>
-  <Primitive
-    data-slot="badge"
-    :data-variant="variant"
-    :class="cn(badgeVariants({ variant }), props.class)"
-    v-bind="delegatedProps"
+  <span
+    class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap"
+    :class="badgeToneClasses[props.tone]"
   >
     <slot />
-  </Primitive>
+  </span>
 </template>
