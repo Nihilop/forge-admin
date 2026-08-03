@@ -120,12 +120,14 @@ const tabClass = (key: string) =>
 
 <template>
   <component :is="Layout">
-    <Link
-      :href="`${prefix}/${resource.name}`"
-      class="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-    >
-      <PhArrowLeft :size="15" /> {{ resource.label }}
-    </Link>
+    <template #header-start>
+      <Link
+        :href="`${prefix}/${resource.name}`"
+        class="my-auto inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <PhArrowLeft :size="15" /> {{ resource.label }}
+      </Link>
+    </template>
 
     <Card>
       <CardContent>

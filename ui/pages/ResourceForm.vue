@@ -54,9 +54,14 @@ const title = computed(() =>
 
 <template>
   <component :is="Layout">
-    <Link :href="backHref" class="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-      <PhArrowLeft :size="15" /> {{ t("form.back") }}
-    </Link>
+    <!-- Contenu de header PAR PAGE : rendu dans le slot `header-start` du shell
+         (avant l'outlet d'extensions). Un layout custom d'hôte qui veut ce lien
+         doit exposer le même slot `header-start`. -->
+    <template #header-start>
+      <Link :href="backHref" class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+        <PhArrowLeft :size="15" /> {{ t("form.back") }}
+      </Link>
+    </template>
 
     <Card>
       <CardContent>

@@ -7,14 +7,22 @@
 // propre chrome via provide(FORGE_LAYOUT, …).
 import { Separator } from "@/primitives/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/primitives/sidebar"
+import { SIDEBAR_COOKIE_NAME } from "@/primitives/sidebar/utils"
 import AdminSidebar from "../components/AdminSidebar.vue"
 import ToggleLang from "../components/ToggleLang.vue"
 import ToggleTheme from "../components/ToggleTheme.vue"
 import ForgeOutlet from "./ForgeOutlet.vue"
+
+// État replié/déplié PERSISTANT : la primitive écrit le cookie à chaque toggle
+// mais son défaut est figé au chargement du module — or Inertia REMONTE le
+// layout à chaque navigation. On relit donc le cookie à CHAQUE setup.
+const sidebarDefaultOpen = typeof document === "undefined"
+  ? true
+  : !document.cookie.includes(`${SIDEBAR_COOKIE_NAME}=false`)
 </script>
 
 <template>
-  <SidebarProvider>
+  <SidebarProvider :default-open="sidebarDefaultOpen">
     <AdminSidebar />
     <SidebarInset>
       <header class="flex h-16 shrink-0 items-center justify-between gap-2">
@@ -24,15 +32,18 @@ import ForgeOutlet from "./ForgeOutlet.vue"
             orientation="vertical"
             class="mr-2 data-[orientation=vertical]:h-4 my-auto"
           />
+          <!-- Slot PAR PAGE (ex. lien retour du form), puis outlet GLOBAL (extensions) -->
+          <slot name="header-start" />
           <ForgeOutlet name="header:start" />
         </div>
         <div class="flex items-center gap-1 px-4">
+          <slot name="header-end" />
           <ForgeOutlet name="header:end" />
           <ToggleLang />
           <ToggleTheme />
         </div>
       </header>
-      <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div class="flex flex-col gap-4 p-4 pt-0 flex-1 min-h-0 overflow-y-auto">
         <slot />
       </div>
     </SidebarInset>
