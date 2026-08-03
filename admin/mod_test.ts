@@ -66,6 +66,24 @@ Deno.test("forge() · anti-CSRF par défaut : POST cross-site bloqué, same-orig
   assertEquals(ok.headers.get("location"), "/admin/f-items/1") // écrit → retour fiche
 })
 
+Deno.test("forge() · extensions serveur : install reçoit l'app assemblée", async () => {
+  let seenPrefix: string | undefined
+  const admin = forge({
+    db: fakeAdapter([]),
+    permissions: "open",
+    extensions: [{
+      name: "test-ext",
+      install: (a) => {
+        seenPrefix = a.prefix
+        a.app.get("/ext/ping", (c) => c.json({ pong: true }))
+      },
+    }],
+  })
+  assertEquals(seenPrefix, "/admin")
+  const res = await admin.fetch(new Request("http://localhost/ext/ping"))
+  assertEquals((await res.json()).pong, true)
+})
+
 Deno.test("forge() · home : redirige la racine", async () => {
   const admin = forge({
     db: fakeAdapter([]),

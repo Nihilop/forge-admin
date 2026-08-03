@@ -2,25 +2,19 @@ import { createApp, h } from "vue"
 import { createInertiaApp } from "@inertiajs/vue3"
 import { PhGauge, PhPackage, PhReceipt, PhRocketLaunch } from "@phosphor-icons/vue"
 import "./style.css"
-import { FORGE_LAYOUT } from "@/layout"
 import { createForgeI18n } from "@/i18n"
 import { FORGE_PAGE_NS, FORGE_STORAGE_NS } from "@/brand"
-import { registerNavIcon } from "@/nav"
-import DevLayout from "./DevLayout.vue"
-
-// Icônes custom de l'APP (escape hatch) : référencées par NOM côté serveur
-// (nav du dashboard, action « Publier »), résolues ici en composants.
-registerNavIcon("gauge", PhGauge)
-registerNavIcon("rocket", PhRocketLaunch)
-registerNavIcon("package", PhPackage)
-registerNavIcon("receipt", PhReceipt)
+import { FORGE_SHELL_OPTIONS } from "@/shell/options"
+import { installForgeExtensions } from "@/extensions"
+import DevToolsButton from "./DevToolsButton.vue"
 
 // i18n de Forge (fr/en). Langue initiale = préférence persistée, sinon fr.
 const i18n = createForgeI18n({ locale: localStorage.getItem(`${FORGE_STORAGE_NS}:locale`) ?? "fr" })
 
 // Résolution DUALE : les pages du MOTEUR (`<ns>/ResourceIndex|Show|Form`) sont
 // résolues depuis le KIT (../ui/pages) ; les autres (ex. "Dashboard") sont les
-// pages de l'APP (./pages). On injecte le layout de l'app via FORGE_LAYOUT.
+// pages de l'APP (./pages). Aucun layout injecté → le ForgeShell par défaut du
+// kit s'applique (clé en main) ; un hôte peut toujours provide(FORGE_LAYOUT, …).
 createInertiaApp({
   resolve: (name) => {
     const isForge = name.startsWith(`${FORGE_PAGE_NS}/`)
@@ -34,10 +28,23 @@ createInertiaApp({
     return pages[key] as object
   },
   setup({ el, App, props, plugin }) {
-    createApp({ render: () => h(App, props) })
+    const app = createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(i18n)
-      .provide(FORGE_LAYOUT, DevLayout)
-      .mount(el)
+
+    // Personnalisation du shell par défaut (titre, sous-titre…).
+    app.provide(FORGE_SHELL_OPTIONS, { title: "Forge", subtitle: "dev" })
+
+    // EXTENSION démo : icônes custom + un bouton dans l'outlet `header` du
+    // shell. Une feature optionnelle (2FA…) se brancherait exactement ainsi.
+    installForgeExtensions(app, [
+      {
+        name: "dev-tools",
+        icons: { gauge: PhGauge, rocket: PhRocketLaunch, package: PhPackage, receipt: PhReceipt },
+        outlets: { header: DevToolsButton },
+      },
+    ], { i18n })
+
+    app.mount(el)
   },
 })

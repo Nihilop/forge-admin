@@ -25,37 +25,68 @@ resolve: (name) => {
 }
 ```
 
-## Injecter votre layout
+## Le shell par défaut (clé en main)
 
-Les pages du kit rendent leur contenu **dans votre chrome** — fourni par
-injection au montage de l'app :
+Sans rien configurer, les pages s'affichent dans **`ForgeShell`** : sidebar
+générée depuis la nav unifiée (groupes, icônes, états actifs), topbar, thème
+clair/sombre persisté, sélecteur de langue, responsive (drawer mobile) — et des
+**outlets** où les extensions se branchent.
+
+Personnalisation par options :
 
 ```ts
-import { FORGE_LAYOUT } from "@/layout"
+import { FORGE_SHELL_OPTIONS } from "@/shell/options"
 
-app.provide(FORGE_LAYOUT, MonLayout)   // sans lui : passthrough minimal
+app.provide(FORGE_SHELL_OPTIONS, {
+  title: "Mon back-office",
+  subtitle: "prod",
+  // logo: MonLogo,          // composant, remplace la pastille
+  // homeHref: "/dashboard",
+  // themeToggle: false,
+  // localeSwitcher: false,
+})
 ```
 
-Votre layout reçoit le contenu en slot par défaut et lit la nav partagée :
+## Remplacer le shell (escape hatch)
 
-```vue
-<script setup lang="ts">
-import { usePage } from "@inertiajs/vue3"
-import { navIcon } from "@/nav"
+Le shell n'est qu'un **défaut**. Pour votre propre chrome, injectez-le — les
+pages du kit rendront leur contenu dedans :
 
-interface NavEntry { name: string; href: string; label: string; group: string; icon?: string; exact?: boolean }
-const nav = computed(() => (usePage().props.forge as { nav: NavEntry[] })?.nav ?? [])
-const active = (e: NavEntry) =>
-  e.exact ? usePage().url === e.href : usePage().url.startsWith(e.href)
-</script>
+```ts
+import { FORGE_LAYOUT, ForgeBareLayout } from "@/layout"
 
-<template>
-  <div class="flex min-h-screen">
-    <aside><!-- groupez `nav` par .group, rendez navIcon(e.icon) + e.label --></aside>
-    <main class="min-w-0 flex-1 p-6"><slot /></main>
-  </div>
-</template>
+app.provide(FORGE_LAYOUT, MonLayout)        // votre chrome complet
+// ou : app.provide(FORGE_LAYOUT, ForgeBareLayout)  // aucun chrome (passthrough)
 ```
+
+Votre layout reçoit le contenu en slot par défaut et lit la nav partagée
+(`usePage().props.forge.nav` — groupez par `.group`, résolvez les icônes avec
+`navIcon()`, gérez `exact` pour l'état actif).
+
+## Les extensions UI
+
+Le kit n'embarque **aucune feature optionnelle** (2FA, notifications, menu
+user…) — il expose des points d'ancrage. Une extension les regroupe :
+
+```ts
+import { installForgeExtensions } from "@/extensions"
+
+installForgeExtensions(app, [
+  {
+    name: "two-factor",
+    outlets: { "sidebar:footer": TwoFactorBadge },  // monté dans le shell
+    inputs: { otp: OtpInput },                       // input de champ custom
+    icons: { shield: PhShieldCheck },
+    messages: { fr: { twoFactor: { title: "Double authentification" } } },
+    setup: ({ app }) => { /* plugins, provide, directives… */ },
+  },
+], { i18n })   // avant app.mount()
+```
+
+Outlets fournis par le shell : `header` (droite de la topbar) et
+`sidebar:footer` (bas de la sidebar). Le pendant **serveur** d'une extension
+(routes, resources, pages) passe par l'option `extensions` de la
+[façade](facade).
 
 ## Les composables
 

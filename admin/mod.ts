@@ -38,6 +38,18 @@ import { type DbOption, resolveDb } from "./db.ts"
 
 export { type DbOption, resolveDb, type SqlExecutor } from "./db.ts"
 
+/** A SERVER-side extension: packages the backend half of an optional feature
+ *  (2FA, audit, notifications…) — routes, resources, pages, hooks — installed
+ *  onto the assembled app. The frontend half goes through the UI kit's
+ *  `installForgeExtensions`. Nothing optional ships by default. */
+export interface ForgeExtension {
+  /** Unique name (diagnostics). */
+  name: string
+  /** Called once, after the app is fully wired: add routes on `admin.app`,
+   *  declare resources/pages, read `admin.prefix`, render with `admin.render`. */
+  install: (admin: ForgeApp) => void
+}
+
 /** The `permissions` option: `"open"` (dev only — grants everything derived
  *  from the registry), a static list, or a per-request resolver (`null` =
  *  anonymous → redirect to `/login`). */
@@ -78,6 +90,9 @@ export interface ForgeOptions {
   home?: string
   /** Monte sur un Hono existant (défaut : nouveau). */
   app?: Hono
+  /** Extensions serveur (2FA, audit…) : installées une fois l'app assemblée.
+   *  Le pendant front passe par `installForgeExtensions` du kit ui. */
+  extensions?: ForgeExtension[]
   /** Escape hatch : surcharge n'importe quel champ du ForgeContext assemblé
    *  (render, redirect, sameOrigin, adapter…). */
   context?: Partial<ForgeContext>
@@ -198,7 +213,7 @@ export function forge(options: ForgeOptions): ForgeApp {
     app.get("/", (c) => c.redirect(home))
   }
 
-  return {
+  const admin: ForgeApp = {
     app,
     fetch: app.fetch,
     inertia,
@@ -206,4 +221,9 @@ export function forge(options: ForgeOptions): ForgeApp {
     render: (c, page, props = {}) => inertia.render(toWebRequest(c), page, props as any),
     prefix,
   }
+
+  // Extensions serveur : installées en dernier, sur l'app complète.
+  for (const ext of options.extensions ?? []) ext.install(admin)
+
+  return admin
 }

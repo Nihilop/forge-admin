@@ -92,10 +92,8 @@ entry resolves them from the kit and injects your layout:
 // src/main.ts
 import { createApp, h } from "vue"
 import { createInertiaApp } from "@inertiajs/vue3"
-import { FORGE_LAYOUT } from "@/layout"
 import { createForgeI18n } from "@/i18n"
 import { FORGE_PAGE_NS } from "@/brand"
-import MyLayout from "./MyLayout.vue"
 
 createInertiaApp({
   resolve: (name) => {
@@ -112,13 +110,15 @@ createInertiaApp({
     createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(createForgeI18n({ locale: "en" }))
-      .provide(FORGE_LAYOUT, MyLayout)   // your sidebar/header
       .mount(el)
   },
 })
 ```
 
-Details (layout, i18n, custom components) live in [Frontend kit](frontend).
+With no injected layout, the kit's **default shell** kicks in: a sidebar
+generated from your resources, light/dark theme, language switcher — turnkey.
+For your own chrome: `provide(FORGE_LAYOUT, MyLayout)`. Details (shell,
+extensions, custom components) live in [Frontend kit](frontend).
 
 ## 4. Run
 

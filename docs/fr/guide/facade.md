@@ -39,6 +39,7 @@ Deno.serve(admin.fetch)
 | `dist` | `dist` | Dossier des assets buildés. |
 | `home` | — | Redirige `/` vers ce chemin. Sans elle, `/` reste à vous. |
 | `app` | nouveau `Hono` | Monte sur un Hono existant. |
+| `extensions` | — | Extensions **serveur** (`{ name, install(admin) }[]`) : installées une fois l'app assemblée — routes, resources, pages d'une feature optionnelle (2FA…). Pendant front : `installForgeExtensions` du kit ([Kit frontend](frontend)). |
 | `context` | — | **Escape hatch** : `Partial<ForgeContext>` appliqué en dernier — surcharge n'importe quelle brique (render, redirect, sameOrigin, adapter…). |
 
 ## Ce que retourne `forge()`
