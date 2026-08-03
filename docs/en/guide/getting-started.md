@@ -115,10 +115,20 @@ createInertiaApp({
 })
 ```
 
+And the **styles**: one line. The kit ships its all-in-one stylesheet
+(Tailwind, light/dark design system, fonts) — YOUR project's Vite build
+generates the final CSS (no precompiled assets, shared purge and tokens with
+your own pages):
+
+```css
+/* src/style.css — imported by your main.ts */
+@import "@streemkit/forge/ui/styles/forge.css";
+```
+
 With no injected layout, the kit's **default shell** kicks in: a sidebar
 generated from your resources, light/dark theme, language switcher — turnkey.
 For your own chrome: `provide(FORGE_LAYOUT, MyLayout)`. Details (shell,
-extensions, custom components) live in [Frontend kit](frontend).
+extensions, theming, custom components) live in [Frontend kit](frontend).
 
 ## 4. Run
 

@@ -125,6 +125,26 @@ import { PhGauge } from "@phosphor-icons/vue"
 registerNavIcon("gauge", PhGauge)
 ```
 
+## Theme & styles
+
+The kit ships **no precompiled CSS**: it provides `ui/styles/forge.css`
+(Tailwind v4 + an `@source` directive pointing at the kit's sources + the
+"Clay" light/dark design system + fonts) and **your project's build**
+generates the final stylesheet — shared purge, tokens shared between the CRUD
+and your custom pages, native HMR.
+
+```css
+/* The default theme, in one line: */
+@import "@streemkit/forge/ui/styles/forge.css";
+
+/* Customize: override tokens AFTER the import. */
+:root { --primary: #4f46e5; --radius: 0.5rem; }
+.dark { --primary: #6366f1; }
+```
+
+Fully custom theme: skip `forge.css` and provide your own tokens (same
+variable names) + `@import "tailwindcss"` + `@source` pointing at the kit.
+
 ## The primitives
 
 The kit exposes its primitives (`@/primitives/*`): `button`, `input`, `select`,
