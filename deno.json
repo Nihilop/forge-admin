@@ -1,0 +1,34 @@
+{
+  "//": "Forge — framework d'admin (engine Deno/Hono + kit Vue ui/ + harnais dev à la racine). Un seul node_modules (racine) → le kit ui/ résout ses deps npm.",
+  "imports": {
+    "forge/engine": "./engine/mod.ts",
+    "forge/admin": "./admin/mod.ts",
+    "deno-inertia": "jsr:@streemkit/inertia-deno@^0.3.0",
+    "deno-inertia/hono": "jsr:@streemkit/inertia-deno@^0.3.0/hono",
+    "hono": "jsr:@hono/hono@^4",
+    "@db/postgres": "jsr:@db/postgres@^0.19"
+  },
+  "tasks": {
+    "install": "deno run -A jsr:@streemkit/inertia-deno-cli@^0.3.0 install",
+    "dev": "cd dev && deno run -A jsr:@streemkit/inertia-deno-cli@^0.3.0 dev",
+    "build": "cd dev && deno run -A jsr:@streemkit/inertia-deno-cli@^0.3.0 build",
+    "serve": "cd dev && PROD_MODE=1 deno run -A server.ts",
+    "check": "deno check dev/server.ts",
+    "test": "deno test -A engine admin",
+    "docs": "npx vitepress dev docs",
+    "docs:build": "npx vitepress build docs",
+    "docs:serve": "deno run -A docs/serve.ts"
+  },
+  "compilerOptions": { "lib": ["deno.ns", "dom", "dom.iterable", "esnext"] },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": false,
+    "singleQuote": false
+  },
+  "lint": {
+    "rules": { "tags": ["recommended"] },
+    "exclude": ["dev/dist", "docs/.vitepress/dist", "docs/.vitepress/cache"]
+  }
+}
