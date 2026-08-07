@@ -302,6 +302,43 @@ Deno.test("widgets · dashboard à la racine du CRUD : données résolues, permi
   assert(openPermissions().includes("zz.secret"))
 })
 
+Deno.test("widgets · scope resource : metrics sur l'index, absentes du dashboard", async () => {
+  defineWidget({
+    key: "w-res",
+    title: "Stock",
+    type: "stat",
+    resource: "f-items",
+    data: () => ({ value: 7 }),
+  })
+  defineWidget({
+    key: "w-res-chart",
+    title: "Courbe",
+    type: "chart",
+    chart: "bar",
+    resource: "f-items",
+    data: () => ({ categories: ["a", "b"], series: [{ name: "s", values: [1, 2] }] }),
+  })
+  const admin = forge({ db: fakeAdapter([]), permissions: "open" })
+  const idx = await admin.fetch(
+    new Request("http://localhost/admin/f-items", { headers: inertiaHeaders }),
+  )
+  const page = await idx.json()
+  const widgets = page.props.widgets as {
+    key: string
+    chart?: string
+    span: number
+    data?: { series?: unknown[] }
+  }[]
+  assertEquals(widgets.map((w) => w.key), ["w-res", "w-res-chart"])
+  assertEquals(widgets[1].chart, "bar")
+  assertEquals(widgets[1].span, 2) // défaut des `chart`
+  assertEquals(widgets[1].data?.series?.length, 1)
+  // Le dashboard ne contient QUE les widgets non scopés.
+  const dash = await admin.fetch(new Request("http://localhost/admin", { headers: inertiaHeaders }))
+  const dashKeys = ((await dash.json()).props.widgets as { key: string }[]).map((w) => w.key)
+  assert(!dashKeys.includes("w-res") && !dashKeys.includes("w-res-chart"))
+})
+
 Deno.test("resolveDb · adapter passthrough, exécuteur enveloppé en Postgres", async () => {
   const adapter = fakeAdapter([])
   assertEquals(resolveDb(adapter), adapter) // même référence

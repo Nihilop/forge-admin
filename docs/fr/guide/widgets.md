@@ -23,7 +23,7 @@ defineWidget({
 Le résolveur `data` est écrit par **vous** (il referme sur votre couche
 d'accès — pool, ORM, fetch…) et exécuté par le moteur **à chaque requête**.
 
-## Les deux types
+## Les trois types
 
 ### `stat` — chiffre-clé
 
@@ -58,16 +58,65 @@ defineWidget({
 })
 ```
 
+### `chart` — graphique (area, bar, line)
+
+`data` renvoie `{ categories, series }` — `categories` sont les libellés de
+l'axe X, chaque série aligne une valeur par point. Multi-séries : la légende
+apparaît automatiquement.
+
+```ts
+defineWidget({
+  key: "orders-week",
+  title: "Commandes (7 jours)",
+  type: "chart",
+  chart: "area", // "area" (défaut) | "bar" | "line"
+  data: async () => ({
+    categories: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+    series: [
+      { name: "Payées", values: [4, 6, 3, 8, 5, 9, 7] },
+      { name: "En attente", values: [1, 2, 1, 3, 2, 1, 0] },
+    ],
+  }),
+})
+```
+
+Les graphiques s'appuient sur les composants charts de shadcn-vue (Unovis) et
+suivent le thème (tokens `--chart-1…5`). La lib de charts est **chargée à la
+demande** (code-splitting) : un admin sans widget `chart` ne télécharge
+jamais Unovis.
+
+## Metrics de resource (`resource`)
+
+Un widget peut être **scopé sur une resource** : il est alors rendu
+**au-dessus du tableau** de sa liste (`<prefix>/<resource>`) au lieu du
+dashboard — le pattern « metrics » de Nova. Même API, mêmes types, mêmes
+permissions :
+
+```ts
+defineWidget({
+  key: "products-stock",
+  title: "Stock total",
+  type: "stat",
+  resource: "products", // ← rendu sur /admin/products
+  data: async () => {
+    const [s] = await query(`SELECT COALESCE(SUM(stock), 0)::int AS n FROM products`)
+    return { value: s.n }
+  },
+})
+```
+
 ## Les options (`WidgetDef`)
 
 | Option | Rôle |
 |---|---|
 | `key` | Id unique. |
 | `title` | Titre de la carte. |
-| `type` | `stat` ou `list`. |
+| `type` | `stat`, `list` ou `chart`. |
+| `chart` | Variante d'un `chart` : `area` (défaut), `bar`, `line`. |
 | `order` | Ordre d'affichage (croissant). |
-| `span` | Largeur en colonnes de la grille (1 à 4). Défaut : `1` (`2` pour les `list`). |
+| `span` | Largeur en colonnes de la grille (1 à 4). Défaut : `1` (`2` pour `list` et `chart`). |
 | `permission` | Permission requise pour **voir** le widget — entre dans le [catalogue dynamique](permissions) de la page rôles. |
+| `resource` | Scope le widget sur l'**index d'une resource** (metric de modèle) au lieu du dashboard. |
 | `data` | Résolveur de données, par requête. |
 
 ## Robustesse

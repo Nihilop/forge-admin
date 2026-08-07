@@ -19,23 +19,39 @@ export interface ListWidgetData {
   items: { label: string; value?: string | number; href?: string }[]
 }
 
+/** Payload attendu d'un widget `chart` (courbes/aires/barres, multi-séries). */
+export interface ChartWidgetData {
+  /** Libellés de l'axe X (un par point). */
+  categories: (string | number)[]
+  /** Séries — `values` aligné sur `categories` (une valeur par point). */
+  series: { name: string; values: number[] }[]
+}
+
 /** The declaration of a dashboard widget — see {@linkcode defineWidget}. */
 export interface WidgetDef {
   /** Id unique. */
   key: string
   /** Titre de la carte. */
   title: string
-  /** Rendu : `stat` (chiffre-clé) ou `list` (liste de lignes). */
-  type: "stat" | "list"
+  /** Rendu : `stat` (chiffre-clé), `list` (lignes) ou `chart` (graphique). */
+  type: "stat" | "list" | "chart"
+  /** Variante d'un widget `chart`. Défaut : `area`. */
+  chart?: "area" | "bar" | "line"
   /** Ordre d'affichage (croissant). Défaut : ordre de déclaration. */
   order?: number
-  /** Largeur en colonnes de la grille (1 à 4). Défaut : `1` (les `list` : 2). */
+  /** Largeur en colonnes de la grille (1 à 4).
+   *  Défaut : `1` (les `list` et `chart` : 2). */
   span?: number
   /** Permission requise pour VOIR le widget (sinon : visible de tous). */
   permission?: string
+  /** Scope le widget sur l'INDEX d'une resource (metric de modèle, façon
+   *  Nova) : rendu AU-DESSUS du tableau de `<prefix>/<resource>` au lieu du
+   *  dashboard. Absent → widget du dashboard (racine du CRUD). */
+  resource?: string
   /** Résolveur de données, exécuté par REQUÊTE côté serveur. Renvoie un
-   *  {@linkcode StatWidgetData} ou {@linkcode ListWidgetData} selon `type`.
-   *  Une erreur n'abat pas le dashboard : la carte affiche un état d'erreur. */
+   *  {@linkcode StatWidgetData}, {@linkcode ListWidgetData} ou
+   *  {@linkcode ChartWidgetData} selon `type`. Une erreur n'abat pas la
+   *  page : la carte affiche un état d'erreur. */
   data: () => Promise<unknown> | unknown
 }
 

@@ -5,7 +5,7 @@
 
 import { type Context, Hono } from "hono"
 import { forgeNav, getResource, type ResourceDef } from "./resource.ts"
-import { allWidgets } from "./widget.ts"
+import { allWidgets, type WidgetDef } from "./widget.ts"
 import { type Field, publicField } from "./field.ts"
 import { forgePage } from "./brand.ts"
 import { setForgePrefix } from "./prefix.ts"
@@ -247,35 +247,41 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
     }
   }
 
-  // ── Racine du CRUD (`GET <prefix>`) : DASHBOARD si des widgets sont
-  // déclarés (données résolues par requête, permissions comprises), sinon
-  // redirection vers la première entrée de nav — cible sûre pour un login. ──
+  /** Résout une liste de widgets pour l'opérateur courant : filtre par
+   *  permission, trie, exécute chaque résolveur `data` — un résolveur qui
+   *  casse n'abat pas la page (carte en état d'erreur). */
+  function resolveWidgets(defs: WidgetDef[], perms: string[]) {
+    const visible = defs
+      .filter((w) => !w.permission || perms.includes(w.permission))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    return Promise.all(visible.map(async (w) => {
+      const base = {
+        key: w.key,
+        title: w.title,
+        type: w.type,
+        chart: w.chart ?? "area",
+        span: w.span ?? (w.type === "list" || w.type === "chart" ? 2 : 1),
+      }
+      try {
+        return { ...base, data: await w.data() }
+      } catch {
+        return { ...base, error: true }
+      }
+    }))
+  }
+
+  // ── Racine du CRUD (`GET <prefix>`) : DASHBOARD si des widgets (non scopés
+  // resource) sont déclarés, sinon redirection vers la première entrée de
+  // nav — cible sûre pour un login. ──
   app.get("/", async (c) => {
-    const defs = allWidgets()
+    const defs = allWidgets().filter((w) => !w.resource)
     if (!defs.length) {
       const first = forgeNav().find((e) => e.href.startsWith(`${prefix}/`))
       return ctx.redirect(first?.href ?? "/")
     }
     const perms = await guard(c)
     if (perms instanceof Response) return perms
-    const visible = defs
-      .filter((w) => !w.permission || perms.includes(w.permission))
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    const widgets = await Promise.all(visible.map(async (w) => {
-      const base = {
-        key: w.key,
-        title: w.title,
-        type: w.type,
-        span: w.span ?? (w.type === "list" ? 2 : 1),
-      }
-      try {
-        return { ...base, data: await w.data() }
-      } catch {
-        // Un résolveur qui casse n'abat pas le dashboard : carte en erreur.
-        return { ...base, error: true }
-      }
-    }))
-    return render(c, forgePage("Dashboard"), { widgets })
+    return render(c, forgePage("Dashboard"), { widgets: await resolveWidgets(defs, perms) })
   })
 
   /** Recherche, filtres facettés et tri d'une LISTE, depuis la query string —
@@ -361,6 +367,9 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
         href: a.href,
       }))
 
+    // Metrics de MODÈLE (widgets scopés `resource`) : au-dessus du tableau.
+    const resourceWidgets = allWidgets().filter((w) => w.resource === def.name)
+
     return render(c, forgePage("ResourceIndex"), {
       resource: { name: def.name, label: def.label, fields: listFields.map(publicField) },
       rows,
@@ -373,6 +382,7 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
       canDelete: def.delete !== false && canWrite,
       listActions,
       bulkActions,
+      widgets: resourceWidgets.length ? await resolveWidgets(resourceWidgets, perms) : [],
     })
   })
 

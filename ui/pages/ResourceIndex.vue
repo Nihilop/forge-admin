@@ -19,6 +19,7 @@ import {
   Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow,
 } from "@forge/primitives/table"
 import ConfirmDialog from "@forge/components/ConfirmDialog.vue"
+import WidgetCard, { type WidgetView } from "@forge/components/WidgetCard.vue"
 import { confirmAction } from "@forge/confirm"
 import { useForgeLayout } from "@forge/layout"
 const Layout = useForgeLayout()
@@ -69,6 +70,7 @@ const props = defineProps<{
   canDelete?: boolean
   listActions?: ListAction[]
   bulkActions?: BulkAction[]
+  widgets?: WidgetView[]
 }>()
 
 const table = useResourceTable(props.resource.name, {
@@ -200,6 +202,14 @@ function exportCsv() {
           <PhPlus :size="16" /> {{ t("actions.new") }}
         </Button>
       </div>
+    </div>
+
+    <!-- METRICS de modèle (widgets scopés `resource`) : au-dessus du tableau -->
+    <div
+      v-if="widgets?.length"
+      class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+    >
+      <WidgetCard v-for="w in widgets" :key="w.key" :widget="w" />
     </div>
 
     <!-- Barre de SÉLECTION : visible dès qu'au moins une ligne est cochée -->

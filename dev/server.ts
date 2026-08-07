@@ -64,6 +64,57 @@ defineWidget({
   },
 })
 defineWidget({
+  key: "orders-by-product",
+  title: "Quantités commandées par produit",
+  type: "chart",
+  chart: "bar",
+  order: 4,
+  data: async () => {
+    const rows = await query(
+      `SELECT p.name, COALESCE(SUM(o.qty), 0)::int AS qty FROM products p
+       LEFT JOIN orders o ON o.product_id = p.id GROUP BY p.name ORDER BY p.name`,
+    )
+    return {
+      categories: rows.map((r) => String(r.name)),
+      series: [{ name: "Quantité", values: rows.map((r) => Number(r.qty)) }],
+    }
+  },
+})
+
+// ── METRICS de MODÈLE (widgets scopés `resource`) : rendues au-dessus du
+// tableau de /admin/products — le pattern « metrics Nova ». ──
+defineWidget({
+  key: "products-stock-total",
+  title: "Stock total",
+  type: "stat",
+  resource: "products",
+  order: 1,
+  data: async () => {
+    const [s] = await query(
+      `SELECT COALESCE(SUM(stock), 0)::int AS stock,
+              COALESCE(SUM(stock * price), 0)::float8 AS value
+       FROM products`,
+    )
+    return { value: s.stock as number, hint: `valeur ${Math.round(Number(s.value))} €` }
+  },
+})
+defineWidget({
+  key: "products-stock-chart",
+  title: "Stock par produit",
+  type: "chart",
+  chart: "bar",
+  resource: "products",
+  order: 2,
+  data: async () => {
+    const rows = await query(`SELECT name, stock FROM products ORDER BY name`)
+    return {
+      categories: rows.map((r) => String(r.name)),
+      series: [{ name: "Stock", values: rows.map((r) => Number(r.stock)) }],
+    }
+  },
+})
+
+defineWidget({
   key: "latest-orders",
   title: "Dernières commandes",
   type: "list",

@@ -92,9 +92,10 @@ export {
 // Pages custom (au-delà du CRUD)
 export { allPages, definePage, type PageDef } from "./page.ts"
 
-// Widgets du dashboard
+// Widgets du dashboard (et metrics de resource)
 export {
   allWidgets,
+  type ChartWidgetData,
   defineWidget,
   type ListWidgetData,
   type StatWidgetData,
