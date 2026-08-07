@@ -5,7 +5,6 @@ import type { BaseChartProps } from "."
 import { Axis, CurveType, Line } from "@unovis/ts"
 
 import { VisAxis, VisLine, VisXYContainer } from "@unovis/vue"
-import { useMounted } from "@vueuse/core"
 import { computed, ref } from "vue"
 import { cn } from '@forge/lib/utils'
 import { ChartCrosshair, ChartLegend, defaultColors } from '@forge/primitives/chart'
@@ -46,8 +45,6 @@ const legendItems = ref<BulletLegendItemInterface[]>(props.categories.map((categ
   inactive: false,
 })))
 
-const isMounted = useMounted()
-
 function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   emits("legendItemClick", d, i)
 }
@@ -57,10 +54,12 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   <div :class="cn('w-full h-[400px] flex flex-col items-end', $attrs.class ?? '')">
     <ChartLegend v-if="showLegend" v-model:items="legendItems" @legend-item-click="handleLegendItemClick" />
 
+    <!-- Forge : `flex-1 min-h-0` au lieu de height:100% — 100% ignorait la
+         légende sœur et faisait déborder l'axe X de la carte parente. -->
     <VisXYContainer
       :margin="{ left: 20, right: 20 }"
       :data="data"
-      :style="{ height: isMounted ? '100%' : 'auto' }"
+      class="w-full min-h-0 flex-1"
     >
       <ChartCrosshair v-if="showTooltip" :colors="colors" :items="legendItems" :index="index" :custom-tooltip="customTooltip" />
 

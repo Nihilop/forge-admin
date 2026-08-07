@@ -5,7 +5,6 @@ import type { BaseChartProps } from "."
 import { Area, Axis, CurveType, Line } from "@unovis/ts"
 
 import { VisArea, VisAxis, VisLine, VisXYContainer } from "@unovis/vue"
-import { useMounted } from "@vueuse/core"
 import { useId } from "reka-ui"
 import { computed, ref } from "vue"
 import { cn } from '@forge/lib/utils'
@@ -55,8 +54,6 @@ const legendItems = ref<BulletLegendItemInterface[]>(props.categories.map((categ
   inactive: false,
 })))
 
-const isMounted = useMounted()
-
 function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   emits("legendItemClick", d, i)
 }
@@ -66,7 +63,9 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   <div :class="cn('w-full h-[400px] flex flex-col items-end', $attrs.class ?? '')">
     <ChartLegend v-if="showLegend" v-model:items="legendItems" @legend-item-click="handleLegendItemClick" />
 
-    <VisXYContainer :style="{ height: isMounted ? '100%' : 'auto' }" :margin="{ left: 20, right: 20 }" :data="data">
+    <!-- Forge : `flex-1 min-h-0` au lieu de height:100% — 100% ignorait la
+         légende sœur et faisait déborder l'axe X de la carte parente. -->
+    <VisXYContainer class="w-full min-h-0 flex-1" :margin="{ left: 20, right: 20 }" :data="data">
       <svg width="0" height="0">
         <defs>
           <linearGradient v-for="(color, i) in colors" :id="`${chartRef}-color-${i}`" :key="i" x1="0" y1="0" x2="0" y2="1">

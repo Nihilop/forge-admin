@@ -2,7 +2,7 @@
 // Rendu des widgets `chart` — composants shadcn-vue (Unovis). Ce fichier est
 // importé DYNAMIQUEMENT par WidgetCard (defineAsyncComponent) : Unovis (lourd)
 // n'entre dans le bundle chargé que si un chart est effectivement affiché.
-import { computed, onMounted, ref } from "vue"
+import { computed } from "vue"
 import { AreaChart } from "@forge/primitives/chart-area"
 import { BarChart } from "@forge/primitives/chart-bar"
 import { LineChart } from "@forge/primitives/chart-line"
@@ -25,15 +25,17 @@ const rows = computed(() =>
 const names = computed(() => props.data.series.map((s) => s.name))
 
 // Couleurs CONCRÈTES depuis les tokens --chart-* du thème (les attributs SVG
-// des gradients ne résolvent pas var()) — ordre pensé pour le contraste.
+// des gradients ne résolvent pas var()) — résolues de façon SYNCHRONE : le
+// composant chart fige les couleurs de sa légende au setup, un onMounted
+// arriverait trop tard (pastilles noires). Toujours client-side (chunk async).
 const RAMP_ORDER = [3, 1, 5, 2, 4]
-const colors = ref<string[]>()
-onMounted(() => {
+const colors = computed<string[] | undefined>(() => {
+  if (typeof document === "undefined") return undefined
   const styles = getComputedStyle(document.documentElement)
   const ramp = RAMP_ORDER
     .map((n) => styles.getPropertyValue(`--chart-${n}`).trim())
     .filter(Boolean)
-  if (ramp.length) colors.value = names.value.map((_, i) => ramp[i % ramp.length])
+  return ramp.length ? names.value.map((_, i) => ramp[i % ramp.length]) : undefined
 })
 
 const component = computed(() =>
