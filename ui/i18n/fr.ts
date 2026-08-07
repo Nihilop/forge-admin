@@ -45,6 +45,10 @@ export default {
       yes: "Oui",
       no: "Non",
     },
+    widgets: {
+      title: "Tableau de bord",
+      error: "Impossible de charger ce widget.",
+    },
     confirm: {
       delete: "Supprimer cet élément ?",
       deleteMany: "Supprimer {n} élément(s) ?",

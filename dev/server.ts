@@ -5,7 +5,7 @@
 
 import { redirect } from "deno-inertia"
 import { forge } from "forge/admin"
-import { definePage } from "forge/engine"
+import { definePage, defineWidget } from "forge/engine"
 import { otpApiOf, otpServer } from "../extensions/otp/mod.ts"
 import { query } from "./db.ts"
 
@@ -24,6 +24,64 @@ definePage({
   label: "Vue d'ensemble",
   nav: { group: "Général", label: "Vue d'ensemble", icon: "gauge", order: 0 },
   exact: true,
+})
+
+// Entrée de menu vers le DASHBOARD Forge (widgets, racine du CRUD).
+definePage({
+  name: "forge-dashboard",
+  href: ADMIN_PREFIX,
+  label: "Dashboard",
+  nav: { group: "Général", label: "Dashboard", icon: "chart", order: 1 },
+  exact: true,
+})
+
+// ── WIDGETS du dashboard Forge (racine du CRUD, <prefix>) : déclaratifs,
+// chaque widget referme sur la couche d'accès de l'APP (query PGlite). ──
+defineWidget({
+  key: "products-active",
+  title: "Produits actifs",
+  type: "stat",
+  order: 1,
+  data: async () => {
+    const [s] = await query(
+      `SELECT COUNT(*) FILTER (WHERE status = 'active')::int AS active, COUNT(*)::int AS total
+       FROM products`,
+    )
+    return { value: s.active as number, hint: `sur ${s.total} produits` }
+  },
+})
+defineWidget({
+  key: "orders-pending",
+  title: "Commandes en attente",
+  type: "stat",
+  order: 2,
+  data: async () => {
+    const [s] = await query(
+      `SELECT COUNT(*) FILTER (WHERE status = 'pending')::int AS pending, COUNT(*)::int AS total
+       FROM orders`,
+    )
+    return { value: s.pending as number, hint: `sur ${s.total} commandes` }
+  },
+})
+defineWidget({
+  key: "latest-orders",
+  title: "Dernières commandes",
+  type: "list",
+  order: 3,
+  data: async () => {
+    const rows = await query(
+      `SELECT o.id, o.customer, o.qty, p.name AS product FROM orders o
+       LEFT JOIN products p ON p.id = o.product_id
+       ORDER BY o.created_at DESC LIMIT 5`,
+    )
+    return {
+      items: rows.map((r) => ({
+        label: `${r.customer} — ${r.product}`,
+        value: `×${r.qty}`,
+        href: `${ADMIN_PREFIX}/orders/${r.id}`,
+      })),
+    }
+  },
 })
 
 // ── La façade : Hono + Inertia + CRUD + assets + AUTH BUILTIN. ──

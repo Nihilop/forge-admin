@@ -93,6 +93,7 @@ const guideEn = [
       { text: "Authentication", link: "/guide/auth" },
       { text: "2FA (OTP extension)", link: "/guide/otp" },
       { text: "Custom pages", link: "/guide/pages" },
+      { text: "Dashboard widgets", link: "/guide/widgets" },
     ],
   },
   {
@@ -139,6 +140,7 @@ const guideFr = [
       { text: "Authentification", link: "/fr/guide/auth" },
       { text: "2FA (extension OTP)", link: "/fr/guide/otp" },
       { text: "Pages custom", link: "/fr/guide/pages" },
+      { text: "Widgets du dashboard", link: "/fr/guide/widgets" },
     ],
   },
   {

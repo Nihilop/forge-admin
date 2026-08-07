@@ -29,6 +29,7 @@ import { serveAssets, toWebRequest } from "deno-inertia/hono"
 import {
   allPages,
   allResources,
+  allWidgets,
   createForgeRouter,
   DEFAULT_ADMIN_PREFIX,
   type ForgeAdapter,
@@ -152,6 +153,7 @@ export function openPermissions(): string[] {
     }
   }
   for (const p of allPages()) if (p.permission) perms.add(p.permission)
+  for (const w of allWidgets()) if (w.permission) perms.add(w.permission)
   return [...perms]
 }
 

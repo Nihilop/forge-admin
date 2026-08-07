@@ -44,6 +44,10 @@ export default {
       yes: "Yes",
       no: "No",
     },
+    widgets: {
+      title: "Dashboard",
+      error: "Could not load this widget.",
+    },
     confirm: {
       delete: "Delete this item?",
       deleteMany: "Delete {n} item(s)?",

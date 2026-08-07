@@ -4,6 +4,7 @@ import {
   boolean,
   datetime,
   defineResource,
+  defineWidget,
   type ForgeAdapter,
   json,
   number,
@@ -246,6 +247,59 @@ Deno.test("liste · bulk delete : supprime chaque id, garde CSRF, redirige la li
   assertEquals(ok.status, 303)
   assertEquals(ok.headers.get("location"), "/admin/f-items")
   assertEquals(deleted, ["1", "3"])
+})
+
+Deno.test("widgets · dashboard à la racine du CRUD : données résolues, permissions, erreurs par carte", async () => {
+  defineWidget({
+    key: "w-stat",
+    title: "Total",
+    type: "stat",
+    order: 1,
+    data: () => ({ value: 42, hint: "test" }),
+  })
+  defineWidget({
+    key: "w-list",
+    title: "Derniers",
+    type: "list",
+    order: 2,
+    data: () => ({ items: [{ label: "A", href: "/admin/f-items/1" }] }),
+  })
+  defineWidget({
+    key: "w-secret",
+    title: "Caché",
+    type: "stat",
+    permission: "zz.secret",
+    data: () => ({ value: 1 }),
+  })
+  defineWidget({
+    key: "w-broken",
+    title: "Cassé",
+    type: "stat",
+    order: 9,
+    data: () => {
+      throw new Error("boom")
+    },
+  })
+  // Liste statique SANS zz.secret → le widget gated disparaît.
+  const admin = forge({ db: fakeAdapter([]), permissions: ["fitems.read"] })
+  const res = await admin.fetch(new Request("http://localhost/admin", { headers: inertiaHeaders }))
+  assertEquals(res.status, 200)
+  const page = await res.json()
+  assertEquals(page.component, "forge/Dashboard")
+  const widgets = page.props.widgets as {
+    key: string
+    span: number
+    error?: boolean
+    data?: { value?: number; items?: unknown[] }
+  }[]
+  assertEquals(widgets.map((w) => w.key), ["w-stat", "w-list", "w-broken"])
+  assertEquals(widgets[0].data?.value, 42)
+  assertEquals(widgets[0].span, 1)
+  assertEquals(widgets[1].span, 2) // défaut des `list`
+  assertEquals(widgets[1].data?.items?.length, 1)
+  assertEquals(widgets[2].error, true) // le résolveur cassé n'abat pas la page
+  // La permission du widget entre dans le catalogue dynamique.
+  assert(openPermissions().includes("zz.secret"))
 })
 
 Deno.test("resolveDb · adapter passthrough, exécuteur enveloppé en Postgres", async () => {

@@ -6,6 +6,7 @@
 import type { Component } from "vue"
 import {
   PhBuildings,
+  PhChartBar,
   PhDotOutline,
   PhFileText,
   PhGauge,
@@ -35,6 +36,7 @@ export interface ForgeNavEntry {
 // équipe, réglages…). Tout le reste passe par registerNavIcon().
 const builtin: Record<string, Component> = {
   gauge: PhGauge,
+  chart: PhChartBar,
   user: PhUser,
   users: PhUsersThree,
   building: PhBuildings,
