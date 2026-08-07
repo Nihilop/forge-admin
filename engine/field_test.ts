@@ -1,5 +1,15 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1"
-import { badge, belongsTo, publicField, text } from "./field.ts"
+import {
+  badge,
+  belongsTo,
+  boolean,
+  datetime,
+  json,
+  number,
+  publicField,
+  text,
+  textarea,
+} from "./field.ts"
 
 Deno.test("field · text : défauts (label humanisé, list true, non éditable)", () => {
   const f = text("legal_name")
@@ -31,6 +41,19 @@ Deno.test("field · belongsTo : relation structurée", () => {
     column: "owner_person_id",
     labelField: "legal_name",
   })
+})
+
+Deno.test("field · nouveaux types : helpers typés, bornes number exposées au front", () => {
+  assertEquals(boolean("featured").type, "boolean")
+  assertEquals(textarea("bio").type, "textarea")
+  assertEquals(datetime("ships_at").type, "datetime")
+  assertEquals(json("meta").type, "json")
+  const f = number("qty", { editable: true, min: 1, max: 100, step: 5 })
+  assertEquals(f.type, "number")
+  const pub = publicField(f)
+  assertEquals(pub.min, 1)
+  assertEquals(pub.max, 100)
+  assertEquals(pub.step, 5)
 })
 
 Deno.test("field · publicField : ne fuit PAS les détails serveur (column/writeColumn/permission)", () => {

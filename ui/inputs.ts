@@ -6,6 +6,10 @@ import TextInput from "./inputs/TextInput.vue"
 import SelectInput from "./inputs/SelectInput.vue"
 import TextareaInput from "./inputs/TextareaInput.vue"
 import MarkdownInput from "./inputs/MarkdownInput.vue"
+import NumberInput from "./inputs/NumberInput.vue"
+import BooleanInput from "./inputs/BooleanInput.vue"
+import DatetimeInput from "./inputs/DatetimeInput.vue"
+import JsonInput from "./inputs/JsonInput.vue"
 import type { PublicField } from "./fields"
 
 const byType: Record<string, Component> = {
@@ -15,6 +19,11 @@ const byType: Record<string, Component> = {
   select: SelectInput,
   badge: SelectInput,
   belongsTo: SelectInput,
+  number: NumberInput,
+  boolean: BooleanInput,
+  textarea: TextareaInput,
+  datetime: DatetimeInput,
+  json: JsonInput,
 }
 
 // Inputs NOMMÉS fournis par le kit (opt-in via `input: "<nom>"` sur un champ).

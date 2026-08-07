@@ -71,17 +71,22 @@ export {
 export {
   badge,
   belongsTo,
+  boolean,
   date,
+  datetime,
   email,
   type Field,
   type FieldFactory,
   type FieldOption,
   type FieldType,
+  json,
+  number,
   type PublicField,
   publicField,
   type Relation,
   select,
   text,
+  textarea,
 } from "./field.ts"
 
 // Pages custom (au-delà du CRUD)

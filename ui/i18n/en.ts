@@ -36,6 +36,10 @@ export default {
     show: {
       empty: "None.",
     },
+    boolean: {
+      yes: "Yes",
+      no: "No",
+    },
     confirm: {
       delete: "Delete this item?",
       cancel: "Cancel",

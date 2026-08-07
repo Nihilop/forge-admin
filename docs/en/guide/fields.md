@@ -8,10 +8,15 @@ edit it (form). You create them with typed helpers.
 | Helper | Usage |
 |---|---|
 | `text(key, opts?)` | Short text (labels, references…). |
+| `textarea(key, opts?)` | Long text — textarea in the form (consider `wide: true`). |
 | `email(key, opts?)` | Email — validated in the form. |
+| `number(key, opts?)` | Number — coerced and validated server-side (`min` / `max` / `step`). |
+| `boolean(key, opts?)` | Boolean — Switch in the form, Yes/No badge in lists. |
 | `select(key, opts?)` | Dropdown (`options`). |
 | `badge(key, opts?)` | Colored enum (`options` + `tone`) — filterable in the list. |
-| `date(key, opts?)` | Timestamp — the frontend formats it (send an epoch in ms). |
+| `date(key, opts?)` | Date only — the frontend formats it (send an epoch in ms). |
+| `datetime(key, opts?)` | Date + time — native input, written as ISO-8601 (UTC). |
+| `json(key, opts?)` | JSON — monospace editor, parse-validated server-side, pretty display. |
 | `belongsTo(key, { … })` | Foreign key to another resource. |
 
 By default a field is **visible in the list** and **not editable** — you opt in
@@ -32,6 +37,7 @@ explicitly to what can be modified.
 | `options` | `[{ value, label, tone? }]` for `select` / `badge`. Submitted values are **validated against the options** server-side. |
 | `permission` | Permission required to **edit** this field — see [Permissions](permissions). |
 | `display` / `input` | Registered custom component — see [Frontend kit](frontend). |
+| `min` / `max` / `step` | Bounds and step of a `number` field — `min`/`max` are validated in the form **and** server-side. |
 
 ## Examples
 
@@ -78,16 +84,38 @@ code and interpreted by the [adapter](engine) (SQL for Postgres). Never inject
 user input into them — the *values* always go through bound parameters.
 :::
 
-**Write ≠ display** — display a formatted string, write the raw column:
+**Bounded number** — the value is coerced (string → number, comma accepted)
+and the bounds are re-validated server-side:
 
 ```ts
-text("price", {
+number("price", {
   label: "Price",
   editable: true,
-  column: "price::text",   // display
-  writeColumn: "price",    // write
+  min: 0,
+  step: 0.01,
+  column: "price::float8", // NUMERIC arrives as a string: cast it for display
+  writeColumn: "price",
 })
 ```
+
+**Boolean, date+time, JSON** — server-side coercion normalizes what the
+browser sends (strings) before the adapter:
+
+```ts
+boolean("featured", { label: "Featured", editable: true }),
+datetime("published_at", { label: "Published", editable: true, list: false }),
+json("metadata", { label: "Metadata", editable: true, list: false, wide: true }),
+```
+
+- `boolean`: Switch in the form, **Yes/No** badge in lists and detail pages.
+- `datetime`: `datetime-local` input (local time), written as **ISO-8601
+  UTC** — a `TIMESTAMPTZ` column takes it as-is.
+- `json`: the input is **parse-validated** ("Invalid JSON" otherwise) and
+  written normalized — a `json`/`jsonb` column casts it natively. The display
+  is pretty-printed (consider `wide: true`).
+
+**Write ≠ display** — display an expression, write the raw column (`column` =
+display, `writeColumn` = write, as on `price` above).
 
 **`belongsTo` relation**:
 

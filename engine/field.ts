@@ -3,7 +3,18 @@
 // transforme en colonnes SQL, le kit Vue les transforme en composants.
 
 /** The built-in field kinds (each has a matching helper: `text()`, `badge()`…). */
-export type FieldType = "text" | "email" | "select" | "badge" | "date" | "belongsTo"
+export type FieldType =
+  | "text"
+  | "email"
+  | "select"
+  | "badge"
+  | "date"
+  | "belongsTo"
+  | "number"
+  | "boolean"
+  | "textarea"
+  | "datetime"
+  | "json"
 
 /** Relation belongsTo : clé étrangère vers une autre resource. */
 export interface Relation {
@@ -61,6 +72,12 @@ export interface Field {
   /** Permission requise pour ÉDITER ce champ. Sinon il est verrouillé dans le
    *  formulaire ET ignoré côté serveur (jamais juste masqué). */
   permission?: string
+  /** Borne minimale (type `number`) — validée au formulaire ET côté serveur. */
+  min?: number
+  /** Borne maximale (type `number`) — validée au formulaire ET côté serveur. */
+  max?: number
+  /** Pas de l'input (type `number`, ex. `0.01` pour un prix). Front seulement. */
+  step?: number
 }
 
 function humanize(k: string): string {
@@ -90,6 +107,16 @@ export const select: FieldFactory = make("select")
 export const badge: FieldFactory = make("badge")
 /** Timestamp field — provide an epoch-ms `column` expression, the frontend formats it. */
 export const date: FieldFactory = make("date")
+/** Numeric field — coerced and validated server-side (`min`/`max`/`step` supported). */
+export const number: FieldFactory = make("number")
+/** Boolean field — toggle in the form, Yes/No badge in lists. */
+export const boolean: FieldFactory = make("boolean")
+/** Long text field — textarea in the form. Pair with `wide: true` on the detail page. */
+export const textarea: FieldFactory = make("textarea")
+/** Date + time field — `datetime-local` input, ISO-8601 written server-side. */
+export const datetime: FieldFactory = make("datetime")
+/** JSON field — monospace editor, parse-validated server-side, pretty-printed display. */
+export const json: FieldFactory = make("json")
 
 /** Champ belongsTo : FK vers une autre resource (affichée en lien, éditée en select). */
 export function belongsTo(
@@ -134,6 +161,12 @@ export interface PublicField {
   relation?: Relation
   /** Full-width rendering (detail + form). */
   wide: boolean
+  /** Minimum bound (`number` fields). */
+  min?: number
+  /** Maximum bound (`number` fields). */
+  max?: number
+  /** Input step (`number` fields). */
+  step?: number
 }
 
 /** Vue « publique » d'un champ envoyée au front (sans les détails serveur). */
@@ -149,5 +182,8 @@ export function publicField(f: Field): PublicField {
     required: f.required ?? false,
     relation: f.relation,
     wide: f.wide ?? false,
+    min: f.min,
+    max: f.max,
+    step: f.step,
   }
 }

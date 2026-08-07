@@ -9,6 +9,9 @@ import BadgeDisplay from "./displays/BadgeDisplay.vue"
 import DateDisplay from "./displays/DateDisplay.vue"
 import RelationDisplay from "./displays/RelationDisplay.vue"
 import MarkdownDisplay from "./displays/MarkdownDisplay.vue"
+import BooleanDisplay from "./displays/BooleanDisplay.vue"
+import DatetimeDisplay from "./displays/DatetimeDisplay.vue"
+import JsonDisplay from "./displays/JsonDisplay.vue"
 
 /** La forme publique d'un champ, telle que le moteur l'envoie en props —
  *  MÊME type que côté serveur (import type pur, zéro code runtime), enrichi
@@ -25,6 +28,11 @@ const byType: Record<string, Component> = {
   badge: BadgeDisplay,
   date: DateDisplay,
   belongsTo: RelationDisplay,
+  number: TextDisplay,
+  boolean: BooleanDisplay,
+  textarea: TextDisplay,
+  datetime: DatetimeDisplay,
+  json: JsonDisplay,
 }
 
 // Displays NOMMÉS fournis par le kit (opt-in via `display: "<nom>"` sur un champ).

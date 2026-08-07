@@ -1,6 +1,17 @@
 import { assert, assertEquals } from "jsr:@std/assert@^1"
 import { defaultSameOrigin, forge, openPermissions, resolveDb } from "./mod.ts"
-import { defineResource, type ForgeAdapter, postgresAdapter, type Row, text } from "forge/engine"
+import {
+  boolean,
+  datetime,
+  defineResource,
+  type ForgeAdapter,
+  json,
+  number,
+  postgresAdapter,
+  type Row,
+  text,
+  textarea,
+} from "forge/engine"
 
 /** Adapter factice : pas de stockage, données cannées. */
 function fakeAdapter(rows: Row[]): ForgeAdapter {
@@ -111,6 +122,82 @@ Deno.test("permissions · liste statique : un champ hors permission reste verrou
   const page = await res.json()
   const name = page.props.resource.fields.find((f: { key: string }) => f.key === "name")
   assertEquals(name.locked, true)
+})
+
+// Resource exerçant les types COERCÉS côté serveur (number/boolean/datetime/json).
+defineResource({
+  name: "f-typed",
+  table: "f_typed",
+  label: "Typed",
+  policy: "ftyped",
+  fields: [
+    text("name", { editable: true }),
+    number("qty", { editable: true, min: 1, max: 100 }),
+    boolean("active", { editable: true }),
+    datetime("ships_at", { editable: true }),
+    json("meta", { editable: true }),
+    textarea("notes", { editable: true }),
+  ],
+})
+
+Deno.test("champs · coercion serveur : number/boolean/datetime/json normalisés avant l'adapter", async () => {
+  let written: Row | null = null
+  const adapter = fakeAdapter([{ id: 1 }])
+  adapter.create = (_d, values) => {
+    written = values
+    return Promise.resolve("1")
+  }
+  const admin = forge({ db: adapter, permissions: "open" })
+  const res = await admin.fetch(
+    new Request("http://localhost/admin/f-typed", {
+      method: "POST",
+      redirect: "manual",
+      headers: { ...inertiaHeaders, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "A",
+        qty: "42,5", // chaîne à virgule → nombre
+        active: "true", // chaîne → booléen
+        ships_at: "2026-08-07T10:30", // datetime-local → ISO
+        meta: '{ "a" : 1 }', // chaîne JSON → normalisée
+        notes: "long texte",
+      }),
+    }),
+  )
+  assertEquals(res.status, 303)
+  const w = written! as Row
+  assertEquals(w.qty, 42.5)
+  assertEquals(w.active, true)
+  assertEquals(String(w.ships_at).endsWith("Z"), true) // ISO UTC
+  assertEquals(w.meta, '{"a":1}')
+  assertEquals(w.notes, "long texte")
+})
+
+Deno.test("champs · validation serveur : nombre hors bornes, JSON et date invalides refusés", async () => {
+  const admin = forge({ db: fakeAdapter([{ id: 1 }]), permissions: "open" })
+  const post = (body: Record<string, unknown>) =>
+    admin.fetch(
+      new Request("http://localhost/admin/f-typed", {
+        method: "POST",
+        redirect: "manual",
+        headers: { ...inertiaHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }),
+    )
+  const bad = await (await post({
+    qty: "999", // > max 100
+    active: "peut-être", // pas un booléen
+    ships_at: "pas une date",
+    meta: "{oops",
+  })).json()
+  assertEquals(bad.props.errors.qty, "Maximum : 100.")
+  assertEquals(bad.props.errors.active, "Valeur invalide.")
+  assertEquals(bad.props.errors.ships_at, "Date invalide.")
+  assertEquals(bad.props.errors.meta, "JSON invalide.")
+
+  const min = await (await post({ qty: "0" })).json()
+  assertEquals(min.props.errors.qty, "Minimum : 1.")
+  const nan = await (await post({ qty: "abc" })).json()
+  assertEquals(nan.props.errors.qty, "Nombre invalide.")
 })
 
 Deno.test("resolveDb · adapter passthrough, exécuteur enveloppé en Postgres", async () => {

@@ -8,10 +8,15 @@ la saisir (formulaire). On les crée avec des helpers typés.
 | Helper | Usage |
 |---|---|
 | `text(key, opts?)` | Texte court (libellés, références…). |
+| `textarea(key, opts?)` | Texte long — textarea au formulaire (pensez `wide: true`). |
 | `email(key, opts?)` | Email — validation au formulaire. |
+| `number(key, opts?)` | Nombre — coercé et validé serveur (`min` / `max` / `step`). |
+| `boolean(key, opts?)` | Booléen — Switch au formulaire, badge Oui/Non en liste. |
 | `select(key, opts?)` | Liste déroulante (`options`). |
 | `badge(key, opts?)` | Enum colorée (`options` + `tone`) — filtrable en liste. |
-| `date(key, opts?)` | Horodatage — le front formate (envoyez un epoch ms). |
+| `date(key, opts?)` | Date seule — le front formate (envoyez un epoch ms). |
+| `datetime(key, opts?)` | Date + heure — input natif, écrit en ISO-8601 (UTC). |
+| `json(key, opts?)` | JSON — éditeur monospace, parse validé serveur, affichage pretty. |
 | `belongsTo(key, { … })` | Clé étrangère vers une autre resource. |
 
 Par défaut un champ est **visible en liste** et **non éditable** — vous
@@ -32,6 +37,7 @@ choisissez explicitement ce qui est modifiable.
 | `options` | `[{ value, label, tone? }]` pour `select` / `badge`. La valeur soumise est **validée contre les options** côté serveur. |
 | `permission` | Permission requise pour **éditer** ce champ — voir [Permissions](permissions). |
 | `display` / `input` | Composant custom enregistré — voir [Kit frontend](frontend). |
+| `min` / `max` / `step` | Bornes et pas d'un champ `number` — `min`/`max` sont validés au formulaire **et** côté serveur. |
 
 ## Exemples
 
@@ -79,16 +85,38 @@ N'y injectez jamais une valeur d'entrée utilisateur — les *valeurs*, elles,
 passent toujours par des paramètres liés.
 :::
 
-**Écriture ≠ affichage** — afficher un texte formaté, écrire la colonne brute :
+**Nombre borné** — la valeur est coercée (chaîne → nombre, virgule acceptée)
+et les bornes sont revalidées côté serveur :
 
 ```ts
-text("price", {
+number("price", {
   label: "Prix",
   editable: true,
-  column: "price::text",   // affichage
-  writeColumn: "price",    // écriture
+  min: 0,
+  step: 0.01,
+  column: "price::float8", // NUMERIC arrive en chaîne : castez pour l'affichage
+  writeColumn: "price",
 })
 ```
+
+**Booléen, date+heure, JSON** — la coercion serveur normalise ce que le
+navigateur envoie (chaînes) avant l'adapter :
+
+```ts
+boolean("featured", { label: "Mis en avant", editable: true }),
+datetime("published_at", { label: "Publié le", editable: true, list: false }),
+json("metadata", { label: "Métadonnées", editable: true, list: false, wide: true }),
+```
+
+- `boolean` : Switch au formulaire, badge **Oui/Non** en liste et fiche.
+- `datetime` : input `datetime-local` (heure locale), écrit en **ISO-8601
+  UTC** — une colonne `TIMESTAMPTZ` l'accepte telle quelle.
+- `json` : la saisie est **parse-validée** (« JSON invalide. » sinon) et
+  écrite normalisée — une colonne `json`/`jsonb` la caste nativement.
+  L'affichage est pretty-printé (pensez `wide: true`).
+
+**Écriture ≠ affichage** — afficher une expression, écrire la colonne brute
+(`column` = affichage, `writeColumn` = écriture, comme sur `price` ci-dessus).
 
 **Relation `belongsTo`** :
 

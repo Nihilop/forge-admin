@@ -154,9 +154,57 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
         errors[f.key] = "Valeur invalide."
         continue
       }
-      values[col] = v === "" ? null : v ?? null
+      const coerced = coerceValue(f, v)
+      if ("error" in coerced) {
+        errors[f.key] = coerced.error
+        continue
+      }
+      values[col] = coerced.value
     }
     return { errors, values }
+  }
+
+  /** COERCION par type : le body JSON transporte surtout des chaînes — chaque
+   *  type valide et normalise sa valeur AVANT l'adapter (jamais de valeur brute
+   *  du client vers le stockage pour ces types). `null` reste `null`. */
+  function coerceValue(f: Field, v: unknown): { value: unknown } | { error: string } {
+    if (v === "" || v === null || v === undefined) return { value: null }
+    switch (f.type) {
+      case "number": {
+        const n = typeof v === "number" ? v : Number(String(v).replace(",", "."))
+        if (!Number.isFinite(n)) return { error: "Nombre invalide." }
+        if (f.min !== undefined && n < f.min) return { error: `Minimum : ${f.min}.` }
+        if (f.max !== undefined && n > f.max) return { error: `Maximum : ${f.max}.` }
+        return { value: n }
+      }
+      case "boolean": {
+        if (typeof v === "boolean") return { value: v }
+        if (v === "true" || v === "on" || v === "1" || v === 1) return { value: true }
+        if (v === "false" || v === "off" || v === "0" || v === 0) return { value: false }
+        return { error: "Valeur invalide." }
+      }
+      case "datetime": {
+        const d = v instanceof Date ? v : new Date(String(v))
+        if (Number.isNaN(d.getTime())) return { error: "Date invalide." }
+        return { value: d.toISOString() }
+      }
+      case "json": {
+        // Chaîne → parse (validation) ; objet déjà structuré → accepté tel quel.
+        // Toujours écrit NORMALISÉ en chaîne JSON (les colonnes json/jsonb
+        // castent le texte nativement, quel que soit le driver).
+        if (typeof v === "string") {
+          try {
+            return { value: JSON.stringify(JSON.parse(v)) }
+          } catch {
+            return { error: "JSON invalide." }
+          }
+        }
+        if (typeof v === "object") return { value: JSON.stringify(v) }
+        return { error: "JSON invalide." }
+      }
+      default:
+        return { value: v }
+    }
   }
 
   // Résout un scope de création (enfant créé depuis le détail d'un parent).
