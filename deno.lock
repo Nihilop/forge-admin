@@ -5009,8 +5009,6 @@
         "npm:@tailwindcss/vite@^4.3.0",
         "npm:@tanstack/vue-table@^8.21.3",
         "npm:@types/node@^26.0.1",
-        "npm:@unovis/ts@^1.6.7",
-        "npm:@unovis/vue@^1.6.7",
         "npm:@vitejs/plugin-vue@^6.0.7",
         "npm:@vueuse/core@^14.4.0",
         "npm:class-variance-authority@~0.7.1",

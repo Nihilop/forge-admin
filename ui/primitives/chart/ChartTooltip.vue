@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-  <Card class="text-sm p-0 bg-transparent! border-none!">
+  <div class="text-sm">
     <CardHeader v-if="title" class="p-3 border-b">
       <CardTitle>
         {{ title }}
@@ -36,5 +36,5 @@ defineProps<{
         <span class="font-semibold ml-4">{{ item.value }}</span>
       </div>
     </CardContent>
-  </Card>
+  </div>
 </template>
