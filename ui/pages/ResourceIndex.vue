@@ -207,7 +207,7 @@ function exportCsv() {
     <!-- METRICS de modèle (widgets scopés `resource`) : au-dessus du tableau -->
     <div
       v-if="widgets?.length"
-      class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+      class="mb-4 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4"
     >
       <WidgetCard v-for="w in widgets" :key="w.key" :widget="w" />
     </div>

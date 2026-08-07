@@ -17,7 +17,9 @@ defineProps<{ widgets: WidgetView[] }>()
   <component :is="Layout">
     <h1 class="mb-4 text-2xl">{{ t("widgets.title") }}</h1>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- items-start : chaque carte garde sa hauteur naturelle (une stat ne
+         s'étire pas à la hauteur du chart voisin) -->
+    <div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <WidgetCard v-for="w in widgets" :key="w.key" :widget="w" />
     </div>
   </component>

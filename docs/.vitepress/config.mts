@@ -41,6 +41,7 @@ const componentGroups = (p: string, labels: {
     items: [
       { text: "Badge", link: `${p}/badge` },
       { text: "Card", link: `${p}/card` },
+      { text: "Charts", link: `${p}/charts` },
       { text: "Table", link: `${p}/table` },
       { text: "Skeleton", link: `${p}/skeleton` },
       { text: "Separator", link: `${p}/separator` },

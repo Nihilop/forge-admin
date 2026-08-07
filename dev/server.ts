@@ -81,6 +81,54 @@ defineWidget({
   },
 })
 
+defineWidget({
+  key: "orders-week",
+  title: "Commandes (7 jours)",
+  type: "chart",
+  chart: "area", // multi-séries → légende automatique
+  order: 5,
+  data: async () => {
+    const rows = await query(
+      `SELECT to_char(d.day, 'DD/MM') AS day,
+              COUNT(o.id) FILTER (WHERE o.status = 'paid')::int    AS paid,
+              COUNT(o.id) FILTER (WHERE o.status = 'pending')::int AS pending
+       FROM generate_series(date_trunc('day', now()) - interval '6 days',
+                            date_trunc('day', now()), interval '1 day') AS d(day)
+       LEFT JOIN orders o ON date_trunc('day', o.created_at) = d.day
+       GROUP BY d.day ORDER BY d.day`,
+    )
+    return {
+      categories: rows.map((r) => String(r.day)),
+      series: [
+        { name: "Payées", values: rows.map((r) => Number(r.paid)) },
+        { name: "En attente", values: rows.map((r) => Number(r.pending)) },
+      ],
+    }
+  },
+})
+defineWidget({
+  key: "revenue-week",
+  title: "CA encaissé (7 jours)",
+  type: "chart",
+  chart: "line",
+  order: 6,
+  data: async () => {
+    const rows = await query(
+      `SELECT to_char(d.day, 'DD/MM') AS day,
+              COALESCE(SUM(o.qty * p.price) FILTER (WHERE o.status = 'paid'), 0)::float8 AS revenue
+       FROM generate_series(date_trunc('day', now()) - interval '6 days',
+                            date_trunc('day', now()), interval '1 day') AS d(day)
+       LEFT JOIN orders o ON date_trunc('day', o.created_at) = d.day
+       LEFT JOIN products p ON p.id = o.product_id
+       GROUP BY d.day ORDER BY d.day`,
+    )
+    return {
+      categories: rows.map((r) => String(r.day)),
+      series: [{ name: "CA (€)", values: rows.map((r) => Math.round(Number(r.revenue))) }],
+    }
+  },
+})
+
 // ── METRICS de MODÈLE (widgets scopés `resource`) : rendues au-dessus du
 // tableau de /admin/products — le pattern « metrics Nova ». ──
 defineWidget({

@@ -39,9 +39,15 @@ function client(): Promise<PGlite> {
         ('Souris ergonomique', 'MS-02', 49.00, 8, false, 'active',
          NULL, '{"couleur": "graphite"}', now() - interval '1 day'),
         ('Écran 27 pouces',   'SC-03', 329.00, 0, false, 'draft', NULL, NULL, NULL);
-      INSERT INTO orders (product_id, customer, qty, status) VALUES
-        (1, 'alice@example.com', 2, 'paid'),
-        (2, 'bob@example.com',   1, 'pending');
+      INSERT INTO orders (product_id, customer, qty, status, created_at) VALUES
+        (1, 'alice@example.com', 2, 'paid',    now() - interval '6 days'),
+        (2, 'bob@example.com',   1, 'pending', now() - interval '5 days'),
+        (1, 'carol@example.com', 3, 'paid',    now() - interval '4 days'),
+        (3, 'dave@example.com',  1, 'paid',    now() - interval '3 days'),
+        (2, 'erin@example.com',  2, 'pending', now() - interval '2 days'),
+        (1, 'frank@example.com', 1, 'paid',    now() - interval '2 days'),
+        (2, 'grace@example.com', 4, 'paid',    now() - interval '1 day'),
+        (1, 'heidi@example.com', 1, 'pending', now());
     `)
     return p
   })())
