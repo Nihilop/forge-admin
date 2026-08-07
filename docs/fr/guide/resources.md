@@ -114,6 +114,47 @@ admin.app.post("/products/:id/publish", async (c) => {
 `listActions` : même forme, affichées sur la **liste**, sans `:id` ni
 `visibleWhen`.
 
+## Sélection multiple : bulk actions & suppression groupée
+
+La liste offre une **sélection multiple** (checkboxes) dès qu'une action
+groupée est possible. Deux briques :
+
+- **Suppression groupée** — fournie d'office (sauf `delete: false`) : la barre
+  de sélection propose « Supprimer », avec confirmation, permission `.write`
+  et hooks `afterDelete` par ligne.
+- **`bulkActions`** — vos actions métier sur la sélection. Même forme que
+  `listActions` ; le kit POSTe `{ ids: string[], …data }` sur `href` (un
+  endpoint de **votre** app), puis recharge la liste :
+
+```ts
+bulkActions: [
+  {
+    key: "activate",
+    label: "Marquer actif",
+    icon: "rocket",
+    confirm: "Marquer les produits sélectionnés comme actifs ?",
+    href: "/products/bulk/activate",
+  },
+],
+```
+
+```ts
+admin.app.post("/products/bulk/activate", async (c) => {
+  const { ids } = await c.req.json() as { ids: string[] }
+  for (const id of ids) await query(`UPDATE products SET status = 'active' WHERE id = $1`, [id])
+  return redirect(`${admin.prefix}/products`)
+})
+```
+
+## Export CSV
+
+Chaque liste s'exporte en un clic (bouton dédié de la barre d'outils) : le
+fichier reprend **exactement la vue courante** — recherche, filtres facettés
+et tri — sans pagination (plafonné à 10 000 lignes). Colonnes = champs
+visibles en liste, les `belongsTo` exportent leur libellé, encodage UTF-8
+avec BOM (Excel-ready). L'endpoint est `GET <prefix>/<resource>/export`
+(permission `.read`).
+
 ## Hooks métier
 
 Invoqués **après** une mutation réussie — le moteur ne sait rien de votre

@@ -15,7 +15,7 @@ la saisir (formulaire). On les crée avec des helpers typés.
 | `select(key, opts?)` | Liste déroulante (`options`). |
 | `badge(key, opts?)` | Enum colorée (`options` + `tone`) — filtrable en liste. |
 | `date(key, opts?)` | Date seule — le front formate (envoyez un epoch ms). |
-| `datetime(key, opts?)` | Date + heure — input natif, écrit en ISO-8601 (UTC). |
+| `datetime(key, opts?)` | Date + heure — date picker (Calendar + heure), écrit en ISO-8601 (UTC). |
 | `json(key, opts?)` | JSON — éditeur monospace, parse validé serveur, affichage pretty. |
 | `belongsTo(key, { … })` | Clé étrangère vers une autre resource. |
 
@@ -109,8 +109,8 @@ json("metadata", { label: "Métadonnées", editable: true, list: false, wide: tr
 ```
 
 - `boolean` : Switch au formulaire, badge **Oui/Non** en liste et fiche.
-- `datetime` : input `datetime-local` (heure locale), écrit en **ISO-8601
-  UTC** — une colonne `TIMESTAMPTZ` l'accepte telle quelle.
+- `datetime` : date picker (Calendar + champ heure, en heure locale), écrit
+  en **ISO-8601 UTC** — une colonne `TIMESTAMPTZ` l'accepte telle quelle.
 - `json` : la saisie est **parse-validée** (« JSON invalide. » sinon) et
   écrite normalisée — une colonne `json`/`jsonb` la caste nativement.
   L'affichage est pretty-printé (pensez `wide: true`).

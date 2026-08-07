@@ -95,6 +95,10 @@ export interface ResourceDef {
   /** Actions custom sur la LISTE (à côté de « Nouveau ») : import, export…
    *  Même forme qu'`actions`, sans `:id` ni `visibleWhen` (pas de ligne). */
   listActions?: ActionDef[]
+  /** Actions GROUPÉES sur la sélection multiple de la liste. Le front POSTe
+   *  `{ ids: string[], …data }` sur `href` (endpoint de TON app), puis
+   *  recharge la liste. Sans `:id` ni `visibleWhen` ni `link`. */
+  bulkActions?: ActionDef[]
   /** Hooks métier (app-spécifiques). Le moteur les invoque, sans rien en savoir. */
   hooks?: {
     /** Après un INSERT réussi (y compris création scoped). */

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, ref, watch } from "vue"
 import { router } from "@inertiajs/vue3"
 import {
   PhCaretDown, PhCaretLeft, PhCaretRight, PhCaretUp, PhCaretUpDown, PhColumns,
-  PhDotsThreeVertical, PhMagnifyingGlass, PhPlus,
+  PhDotsThreeVertical, PhDownloadSimple, PhMagnifyingGlass, PhPlus, PhTrash, PhX,
 } from "@phosphor-icons/vue"
 import { Button } from "@forge/primitives/button"
+import { Checkbox } from "@forge/primitives/checkbox"
 import { Input } from "@forge/primitives/input"
 import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem,
@@ -46,6 +47,16 @@ interface ListAction {
   link?: boolean
 }
 
+interface BulkAction {
+  key: string
+  label: string
+  icon?: string
+  variant: "default" | "outline" | "ghost" | "destructive" | "secondary"
+  confirm?: string
+  data?: Record<string, unknown>
+  href: string
+}
+
 const props = defineProps<{
   resource: ResourceMeta
   rows: Record<string, unknown>[]
@@ -57,6 +68,7 @@ const props = defineProps<{
   canWrite?: boolean
   canDelete?: boolean
   listActions?: ListAction[]
+  bulkActions?: BulkAction[]
 }>()
 
 const table = useResourceTable(props.resource.name, {
@@ -88,6 +100,42 @@ async function fireListAction(a: ListAction) {
   }
   if (a.confirm && !(await confirmAction(a.confirm))) return
   router.post(a.href, a.data ?? {})
+}
+
+// ── Sélection multiple (bulk delete + actions groupées) ──
+const selected = ref(new Set<string>())
+watch(() => props.rows, () => (selected.value = new Set())) // reload → reset
+
+const selectable = computed(() => !!props.canDelete || !!props.bulkActions?.length)
+const allChecked = computed({
+  get: () => props.rows.length > 0 && props.rows.every((r) => selected.value.has(String(r.id))),
+  set: (v: boolean) => {
+    selected.value = v ? new Set(props.rows.map((r) => String(r.id))) : new Set()
+  },
+})
+
+function toggleRow(id: string, v: boolean) {
+  const next = new Set(selected.value)
+  if (v) next.add(id)
+  else next.delete(id)
+  selected.value = next
+}
+
+async function bulkDelete() {
+  const n = selected.value.size
+  if (!n || !(await confirmAction(t("confirm.deleteMany", { n })))) return
+  router.post(`${prefix}/${props.resource.name}/bulk/delete`, { ids: [...selected.value] })
+}
+
+async function fireBulkAction(a: BulkAction) {
+  if (a.confirm && !(await confirmAction(a.confirm))) return
+  router.post(a.href, { ids: [...selected.value], ...(a.data ?? {}) })
+}
+
+/** Export CSV : mêmes lignes que la vue courante (recherche, filtres, tri). */
+function exportCsv() {
+  const params = typeof location === "undefined" ? "" : location.search
+  window.location.href = `${prefix}/${props.resource.name}/export${params}`
 }
 </script>
 
@@ -141,6 +189,10 @@ async function fireListAction(a: ListAction) {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <Button variant="outline" size="icon" :aria-label="t('index.export')" @click="exportCsv">
+          <PhDownloadSimple :size="16" />
+        </Button>
+
         <Button v-for="a in listActions" :key="a.key" :variant="a.variant" @click="fireListAction(a)">
           <component :is="navIcon(a.icon)" :size="16" /> {{ a.label }}
         </Button>
@@ -150,10 +202,37 @@ async function fireListAction(a: ListAction) {
       </div>
     </div>
 
+    <!-- Barre de SÉLECTION : visible dès qu'au moins une ligne est cochée -->
+    <div
+      v-if="selected.size > 0"
+      class="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2"
+    >
+      <span class="text-sm font-medium">{{ t("index.selected", { n: selected.size }) }}</span>
+      <span class="flex-1" />
+      <Button
+        v-for="a in bulkActions"
+        :key="a.key"
+        :variant="a.variant"
+        size="sm"
+        @click="fireBulkAction(a)"
+      >
+        <component :is="navIcon(a.icon)" :size="15" /> {{ a.label }}
+      </Button>
+      <Button v-if="canDelete" variant="destructive" size="sm" @click="bulkDelete">
+        <PhTrash :size="15" /> {{ t("actions.delete") }}
+      </Button>
+      <Button variant="ghost" size="icon-sm" :aria-label="t('index.clear')" @click="allChecked = false">
+        <PhX :size="15" />
+      </Button>
+    </div>
+
     <div class="rounded-xl border bg-card/40">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead v-if="selectable" class="w-8">
+              <Checkbox v-model="allChecked" :aria-label="t('index.selectAll')" />
+            </TableHead>
             <!-- En-têtes cliquables : asc → desc → aucun (tri server-side) -->
             <TableHead
               v-for="f in visibleFields"
@@ -172,13 +251,20 @@ async function fireListAction(a: ListAction) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableEmpty v-if="!rows.length" :colspan="visibleFields.length + 1">{{ t("index.empty") }}</TableEmpty>
+          <TableEmpty v-if="!rows.length" :colspan="visibleFields.length + (selectable ? 2 : 1)">{{ t("index.empty") }}</TableEmpty>
           <TableRow
             v-for="(row, i) in rows"
             :key="i"
             class="cursor-pointer"
+            :data-state="selected.has(String(row.id)) ? 'selected' : undefined"
             @click="router.visit(`${prefix}/${resource.name}/${row.id}`)"
           >
+            <TableCell v-if="selectable" class="w-8" @click.stop>
+              <Checkbox
+                :model-value="selected.has(String(row.id))"
+                @update:model-value="(v) => toggleRow(String(row.id), v === true)"
+              />
+            </TableCell>
             <TableCell v-for="f in visibleFields" :key="f.key">
               <component :is="displayFor(f)" :field="f" :value="row[f.key]" />
             </TableCell>

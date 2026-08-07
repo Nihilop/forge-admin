@@ -32,6 +32,7 @@ const componentGroups = (p: string, labels: {
       { text: "Checkbox", link: `${p}/checkbox` },
       { text: "Switch", link: `${p}/switch` },
       { text: "Label", link: `${p}/label` },
+      { text: "Calendar", link: `${p}/calendar` },
     ],
   },
   {
@@ -52,6 +53,7 @@ const componentGroups = (p: string, labels: {
     items: [
       { text: "Dialog", link: `${p}/dialog` },
       { text: "AlertDialog", link: `${p}/alert-dialog` },
+      { text: "Popover", link: `${p}/popover` },
       { text: "Sheet", link: `${p}/sheet` },
       { text: "Sonner (toasts)", link: `${p}/sonner` },
     ],

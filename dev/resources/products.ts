@@ -43,6 +43,15 @@ export default defineResource({
       href: "/products/:id/publish", // endpoint de l'APP (dev/server.ts)
     },
   ],
+  bulkActions: [
+    {
+      key: "activate",
+      label: "Marquer actif",
+      icon: "rocket",
+      confirm: "Marquer les produits sélectionnés comme actifs ?",
+      href: "/products/bulk/activate", // endpoint de l'APP (dev/server.ts)
+    },
+  ],
   fields: [
     text("name", { label: "Nom", searchable: true, editable: true, required: true }),
     text("sku", { label: "Référence", searchable: true, editable: true }),

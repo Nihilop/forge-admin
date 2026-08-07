@@ -15,7 +15,7 @@ edit it (form). You create them with typed helpers.
 | `select(key, opts?)` | Dropdown (`options`). |
 | `badge(key, opts?)` | Colored enum (`options` + `tone`) — filterable in the list. |
 | `date(key, opts?)` | Date only — the frontend formats it (send an epoch in ms). |
-| `datetime(key, opts?)` | Date + time — native input, written as ISO-8601 (UTC). |
+| `datetime(key, opts?)` | Date + time — date picker (Calendar + time), written as ISO-8601 (UTC). |
 | `json(key, opts?)` | JSON — monospace editor, parse-validated server-side, pretty display. |
 | `belongsTo(key, { … })` | Foreign key to another resource. |
 
@@ -108,8 +108,8 @@ json("metadata", { label: "Metadata", editable: true, list: false, wide: true })
 ```
 
 - `boolean`: Switch in the form, **Yes/No** badge in lists and detail pages.
-- `datetime`: `datetime-local` input (local time), written as **ISO-8601
-  UTC** — a `TIMESTAMPTZ` column takes it as-is.
+- `datetime`: date picker (Calendar + time field, in local time), written as
+  **ISO-8601 UTC** — a `TIMESTAMPTZ` column takes it as-is.
 - `json`: the input is **parse-validated** ("Invalid JSON" otherwise) and
   written normalized — a `json`/`jsonb` column casts it natively. The display
   is pretty-printed (consider `wide: true`).

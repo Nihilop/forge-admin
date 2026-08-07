@@ -64,6 +64,17 @@ admin.app.post("/products/:id/publish", async (c) => {
   return redirect(`${admin.prefix}/products/${id}`)
 })
 
+// Endpoint métier ciblé par la BULK ACTION « Marquer actif » (sélection
+// multiple de la liste) : reçoit { ids } et repart sur la liste.
+admin.app.post("/products/bulk/activate", async (c) => {
+  const body = await c.req.json().catch(() => ({})) as { ids?: unknown }
+  const ids = Array.isArray(body.ids) ? body.ids.map(String) : []
+  for (const id of ids) {
+    await query(`UPDATE products SET status = 'active' WHERE id = $1`, [id])
+  }
+  return redirect(`${admin.prefix}/products`)
+})
+
 // Une API JSON qui vit à côté de l'admin (l'app reste une app normale).
 admin.app.get("/api/stats", async (c) => c.json(await stats()))
 

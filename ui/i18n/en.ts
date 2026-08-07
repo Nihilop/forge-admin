@@ -25,6 +25,10 @@ export default {
       perPage: "{n} / page",
       prev: "Previous",
       next: "Next",
+      export: "Export as CSV",
+      selected: "{n} selected",
+      selectAll: "Select all",
+      clear: "Clear selection",
     },
     form: {
       titleCreate: "New — {label}",
@@ -42,6 +46,7 @@ export default {
     },
     confirm: {
       delete: "Delete this item?",
+      deleteMany: "Delete {n} item(s)?",
       cancel: "Cancel",
       confirm: "Confirm",
     },

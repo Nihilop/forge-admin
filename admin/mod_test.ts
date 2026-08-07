@@ -200,6 +200,54 @@ Deno.test("champs · validation serveur : nombre hors bornes, JSON et date inval
   assertEquals(nan.props.errors.qty, "Nombre invalide.")
 })
 
+Deno.test("liste · export CSV : entêtes + lignes filtrées, échappement, BOM", async () => {
+  const admin = forge({
+    db: fakeAdapter([
+      { id: 1, name: 'Virgule, et "guillemets"' },
+      { id: 2, name: "Simple" },
+    ]),
+    permissions: "open",
+  })
+  const res = await admin.fetch(new Request("http://localhost/admin/f-items/export"))
+  assertEquals(res.status, 200)
+  assert(res.headers.get("content-type")?.includes("text/csv"))
+  assert(res.headers.get("content-disposition")?.includes('filename="f-items.csv"'))
+  const body = await res.text()
+  assert(body.startsWith("\uFEFF")) // BOM Excel
+  const lines = body.slice(1).split("\r\n")
+  assertEquals(lines[0], "Name")
+  assertEquals(lines[1], '"Virgule, et ""guillemets"""')
+  assertEquals(lines[2], "Simple")
+})
+
+Deno.test("liste · bulk delete : supprime chaque id, garde CSRF, redirige la liste", async () => {
+  const deleted: string[] = []
+  const adapter = fakeAdapter([{ id: 1 }, { id: 2 }, { id: 3 }])
+  adapter.delete = (_d, id) => {
+    deleted.push(id)
+    return Promise.resolve()
+  }
+  const admin = forge({ db: adapter, permissions: "open" })
+  const post = (headers: Record<string, string> = {}) =>
+    admin.fetch(
+      new Request("http://localhost/admin/f-items/bulk/delete", {
+        method: "POST",
+        redirect: "manual",
+        headers: { ...inertiaHeaders, "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({ ids: [1, 3] }),
+      }),
+    )
+  // Cross-site → rejeté, rien supprimé.
+  const evil = await post({ Origin: "http://evil.example" })
+  assertEquals(evil.headers.get("location"), "/")
+  assertEquals(deleted.length, 0)
+  // Same-origin → chaque id supprimé, retour liste.
+  const ok = await post()
+  assertEquals(ok.status, 303)
+  assertEquals(ok.headers.get("location"), "/admin/f-items")
+  assertEquals(deleted, ["1", "3"])
+})
+
 Deno.test("resolveDb · adapter passthrough, exécuteur enveloppé en Postgres", async () => {
   const adapter = fakeAdapter([])
   assertEquals(resolveDb(adapter), adapter) // même référence

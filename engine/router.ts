@@ -253,18 +253,13 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
     return ctx.redirect(first?.href ?? "/")
   })
 
-  // ── Liste ──
-  app.get("/:resource", async (c) => {
-    const def = getResource(c.req.param("resource"))
-    if (!def) return ctx.redirect("/")
-    const perms = await guard(c, `${def.policy}.read`)
-    if (perms instanceof Response) return perms
-
+  /** Recherche, filtres facettés et tri d'une LISTE, depuis la query string —
+   *  tout est whitelisté (options code-defined, clés de champs déclarées).
+   *  Partagé entre l'index et l'export CSV (mêmes lignes dans les deux). */
+  function listQuery(c: Context, def: ResourceDef) {
     const listFields = def.fields.filter((f) => f.list !== false)
-
-    // ── Recherche + filtres facettés `f_<key>=<valeur>` sur les champs À
-    // OPTIONS (badge/select) — la valeur doit exister dans les options
-    // (code-defined) ; l'adapter ne reçoit que du whitelisté. ──
+    // Filtres facettés `f_<key>=<valeur>` sur les champs À OPTIONS
+    // (badge/select) — la valeur doit exister dans les options.
     const q = (c.req.query("q") ?? "").trim()
     const filters: Record<string, string> = {}
     const filterList: NonNullable<ListWhere["filters"]> = []
@@ -277,11 +272,21 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
       filterList.push({ field: f, value })
     }
     const where: ListWhere = { q, filters: filterList }
-
-    // ── Tri (clé de champ whitelistée) + pagination ──
+    // Tri (clé de champ whitelistée).
     const sortKey = c.req.query("sort") ?? ""
     const dir = c.req.query("dir") === "asc" ? "asc" as const : "desc" as const
     const sortField = sortKey ? listFields.find((f) => f.key === sortKey) : undefined
+    return { listFields, q, filters, where, sortField, dir }
+  }
+
+  // ── Liste ──
+  app.get("/:resource", async (c) => {
+    const def = getResource(c.req.param("resource"))
+    if (!def) return ctx.redirect("/")
+    const perms = await guard(c, `${def.policy}.read`)
+    if (perms instanceof Response) return perms
+
+    const { listFields, q, filters, where, sortField, dir } = listQuery(c, def)
 
     const per = Math.min(100, Math.max(5, Number(c.req.query("per")) || 25))
     const total = await db.count(def, where)
@@ -315,6 +320,22 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
         link: a.link ?? false,
       }))
 
+    // Actions GROUPÉES (sélection multiple) : mêmes règles de permission.
+    const bulkActions = (def.bulkActions ?? [])
+      .filter((a) => {
+        const perm = a.permission ?? `${def.policy}.write`
+        return !perm || perms.includes(perm)
+      })
+      .map((a) => ({
+        key: a.key,
+        label: a.label,
+        icon: a.icon,
+        variant: a.variant ?? "outline",
+        confirm: a.confirm,
+        data: a.data ?? {},
+        href: a.href,
+      }))
+
     return render(c, forgePage("ResourceIndex"), {
       resource: { name: def.name, label: def.label, fields: listFields.map(publicField) },
       rows,
@@ -326,7 +347,62 @@ export function createForgeRouter(ctx: ForgeContext): Hono {
       canWrite,
       canDelete: def.delete !== false && canWrite,
       listActions,
+      bulkActions,
     })
+  })
+
+  // ── Export CSV : les MÊMES lignes que la liste courante (recherche, filtres,
+  // tri — via listQuery), sans pagination (plafonné). Colonnes = champs de
+  // liste ; les belongsTo exportent leur libellé. ──
+  const EXPORT_LIMIT = 10_000
+
+  function csvCell(v: unknown): string {
+    if (v == null) return ""
+    const s = typeof v === "object"
+      ? (v as Row).label !== undefined ? String((v as Row).label ?? "") : JSON.stringify(v)
+      : String(v)
+    return /[",\n\r]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s
+  }
+
+  app.get("/:resource/export", async (c) => {
+    const def = getResource(c.req.param("resource"))
+    if (!def) return ctx.redirect("/")
+    const perms = await guard(c, `${def.policy}.read`)
+    if (perms instanceof Response) return perms
+    const { listFields, where, sortField, dir } = listQuery(c, def)
+    const rows = await db.list(def, {
+      ...where,
+      fields: listFields,
+      sort: sortField ? { field: sortField, dir } : undefined,
+      limit: EXPORT_LIMIT,
+      offset: 0,
+    })
+    const lines = [listFields.map((f) => csvCell(f.label)).join(",")]
+    for (const r of rows) lines.push(listFields.map((f) => csvCell(r[f.key])).join(","))
+    // BOM : Excel ouvre l'UTF-8 correctement.
+    return new Response("\uFEFF" + lines.join("\r\n"), {
+      headers: {
+        "content-type": "text/csv; charset=utf-8",
+        "content-disposition": `attachment; filename="${def.name}.csv"`,
+      },
+    })
+  })
+
+  // ── Suppression GROUPÉE (sélection multiple). Mêmes gardes que l'unitaire :
+  // anti-CSRF + permission write + `delete !== false` ; hooks par ligne. ──
+  app.post("/:resource/bulk/delete", async (c) => {
+    const def = getResource(c.req.param("resource"))
+    if (!def || def.delete === false) return ctx.redirect(`${prefix}/${def?.name ?? ""}`)
+    const perms = await guardWrite(c, `${def.policy}.write`)
+    if (perms instanceof Response) return perms
+    const body = await c.req.json().catch(() => ({})) as { ids?: unknown }
+    const ids = Array.isArray(body.ids) ? body.ids.map(String).slice(0, 500) : []
+    for (const id of ids) {
+      const before = def.hooks?.afterDelete ? await db.getRaw(def, id) : null
+      await db.delete(def, id)
+      if (def.hooks?.afterDelete) await def.hooks.afterDelete({ id, row: before })
+    }
+    return ctx.redirect(`${prefix}/${def.name}`)
   })
 
   // ── Création : formulaire vide (standalone ou scoped depuis un parent) ──

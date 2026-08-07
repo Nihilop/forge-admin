@@ -114,6 +114,46 @@ admin.app.post("/products/:id/publish", async (c) => {
 `listActions`: same shape, shown on the **list**, without `:id` or
 `visibleWhen`.
 
+## Multi-select: bulk actions & bulk delete
+
+The list offers **multi-select** (checkboxes) as soon as a grouped action is
+possible. Two building blocks:
+
+- **Bulk delete** — provided out of the box (unless `delete: false`): the
+  selection bar offers "Delete", with confirmation, the `.write` permission
+  and per-row `afterDelete` hooks.
+- **`bulkActions`** — your business actions on the selection. Same shape as
+  `listActions`; the kit POSTs `{ ids: string[], …data }` to `href` (an
+  endpoint of **your** app), then reloads the list:
+
+```ts
+bulkActions: [
+  {
+    key: "activate",
+    label: "Mark active",
+    icon: "rocket",
+    confirm: "Mark the selected products as active?",
+    href: "/products/bulk/activate",
+  },
+],
+```
+
+```ts
+admin.app.post("/products/bulk/activate", async (c) => {
+  const { ids } = await c.req.json() as { ids: string[] }
+  for (const id of ids) await query(`UPDATE products SET status = 'active' WHERE id = $1`, [id])
+  return redirect(`${admin.prefix}/products`)
+})
+```
+
+## CSV export
+
+Every list exports in one click (dedicated toolbar button): the file mirrors
+**exactly the current view** — search, faceted filters and sort — without
+pagination (capped at 10,000 rows). Columns = the list fields, `belongsTo`
+fields export their label, UTF-8 with BOM (Excel-ready). The endpoint is
+`GET <prefix>/<resource>/export` (`.read` permission).
+
 ## Business hooks
 
 Invoked **after** a successful mutation — the engine knows nothing about your

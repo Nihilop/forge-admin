@@ -26,6 +26,10 @@ export default {
       perPage: "{n} / page",
       prev: "Précédent",
       next: "Suivant",
+      export: "Exporter en CSV",
+      selected: "{n} sélectionné(s)",
+      selectAll: "Tout sélectionner",
+      clear: "Effacer la sélection",
     },
     form: {
       titleCreate: "Nouveau — {label}",
@@ -43,6 +47,7 @@ export default {
     },
     confirm: {
       delete: "Supprimer cet élément ?",
+      deleteMany: "Supprimer {n} élément(s) ?",
       cancel: "Annuler",
       confirm: "Confirmer",
     },
